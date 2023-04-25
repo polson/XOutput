@@ -29,7 +29,7 @@ namespace XOutput.UI.Windows
                 item.Tag = device;
                 item.Content = new TextBlock(new Run(device.DisplayName));
                 Model.ForceFeedbacks.Add(item);
-                if (!string.IsNullOrEmpty(controller.Mapper.ForceFeedbackDevice) && controller.Mapper.ForceFeedbackDevice == device.UniqueId)
+                if (!string.IsNullOrEmpty(controller.Mapper.ForceFeedbackDevice) && controller.Mapper.ForceFeedbackDevice == device.DisplayName)
                 {
                     Model.ForceFeedback = item;
                 }
@@ -56,7 +56,7 @@ namespace XOutput.UI.Windows
             if (Model.ForceFeedback.Tag != null)
             {
                 var device = Model.ForceFeedback.Tag as IInputDevice;
-                controller.Mapper.ForceFeedbackDevice = device?.UniqueId;
+                controller.Mapper.ForceFeedbackDevice = device?.DisplayName;
                 controller.ForceFeedbackDevice = device;
             }
             else

@@ -30,7 +30,7 @@ namespace XOutput.Devices.Mapper
                 {
                     source = newValue;
                     InputType = source.Offset.ToString();
-                    InputDevice = source.InputDevice?.UniqueId;
+                    InputDevice = source.InputDevice?.DisplayName;
                 }
             }
         }

@@ -54,7 +54,7 @@ namespace XOutput.Devices.Input.DirectInput
         /// </summary>
         /// <param name="deviceInstance">native instance</param>
         /// <returns>Wrapped instance</returns>
-        public DirectDevice CreateDirectDevice(DeviceInstance deviceInstance)
+        public DirectDevice CreateDirectDevice(DeviceInstance deviceInstance, String deviceName)
         {
             try
             {
@@ -65,7 +65,7 @@ namespace XOutput.Devices.Input.DirectInput
                     return null;
                 }
                 joystick.Properties.BufferSize = 128;
-                var device = new DirectDevice(deviceInstance, joystick);
+                var device = new DirectDevice(deviceInstance, joystick, deviceName);
                 InputDevices.Instance.Add(device);
                 return device;
             }

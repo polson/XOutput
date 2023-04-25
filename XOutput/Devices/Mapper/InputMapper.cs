@@ -86,7 +86,7 @@ namespace XOutput.Devices.Mapper
                     {
                         foreach (var inputDevice in inputDevices)
                         {
-                            if (mapperData.InputDevice == inputDevice.UniqueId)
+                            if (mapperData.InputDevice == inputDevice.DisplayName)
                             {
                                 mapperData.SetSourceWithoutSaving(inputDevice.Sources.FirstOrDefault(s => s.Offset.ToString() == mapperData.InputType));
                                 inputs.Add(inputDevice);

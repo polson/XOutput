@@ -53,7 +53,8 @@ namespace XOutput.Devices.Input.DirectInput
         /// Gets the product name of the device.
         /// <para>Implements <see cref="IInputDevice.DisplayName"/></para>
         /// </summary>
-        public string DisplayName => deviceInstance.ProductName;
+        private readonly string displayName;
+        public string DisplayName => displayName;
         /// <summary>
         /// Gets or sets if the device is connected and ready to use.
         /// <para>Implements <see cref="IInputDevice.Connected"/></para>
@@ -121,10 +122,11 @@ namespace XOutput.Devices.Input.DirectInput
         /// </summary>
         /// <param name="deviceInstance">SharpDX instanse</param>
         /// <param name="joystick">SharpDX joystick</param>
-        public DirectDevice(DeviceInstance deviceInstance, Joystick joystick)
+        public DirectDevice(DeviceInstance deviceInstance, Joystick joystick, String displayName)
         {
             this.deviceInstance = deviceInstance;
             this.joystick = joystick;
+            this.displayName = displayName;
             var buttonObjectInstances = joystick.GetObjects(DeviceObjectTypeFlags.Button).Where(b => b.Usage > 0).OrderBy(b => b.ObjectId.InstanceNumber).Take(128).ToArray();
             var buttons = buttonObjectInstances.Select((b, i) => new DirectInputSource(this, "Button " + b.Usage, InputSourceTypes.Button, b.Offset, state => state.Buttons[i] ? 1 : 0)).ToArray();
             var axes = GetAxes().OrderBy(a => a.Usage).Take(24).Select(GetAxisSource);

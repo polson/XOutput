@@ -70,8 +70,12 @@ namespace XOutput
 
         private void Application_Exit(object sender, ExitEventArgs e)
         {
-            mainWindowViewModel?.Dispose();
-            ApplicationContext.Global.Close();
+            try {
+                mainWindowViewModel?.Dispose();
+                ApplicationContext.Global.Close();
+            } catch (Exception ex) {
+                //YOLO
+            }
         }
     }
 }

@@ -67,7 +67,7 @@ namespace XOutput.Devices
             xInput = new XOutputDevice(mapper);
             if (!string.IsNullOrEmpty(mapper.ForceFeedbackDevice))
             {
-                var device = InputDevices.Instance.GetDevices().OfType<DirectDevice>().FirstOrDefault(d => d.UniqueId == mapper.ForceFeedbackDevice);
+                var device = InputDevices.Instance.GetDevices().OfType<DirectDevice>().FirstOrDefault(d => d.DisplayName == mapper.ForceFeedbackDevice);
                 if (device != null)
                 {
                     ForceFeedbackDevice = device;
@@ -87,8 +87,8 @@ namespace XOutput.Devices
         public void Dispose()
         {
             Stop();
-            xInput?.Dispose();
-            XOutputInterface?.Dispose();
+            // xInput?.Dispose();
+            // XOutputInterface?.Dispose();
         }
 
         /// <summary>

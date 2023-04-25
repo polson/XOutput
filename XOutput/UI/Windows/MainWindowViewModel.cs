@@ -36,6 +36,7 @@ namespace XOutput.UI.Windows
         private Action<string> log;
         private Settings settings;
         private bool installed;
+        private List<string> DisplayNames { get; } = new List<string>();
 
         public MainWindowViewModel(MainWindowModel model, Dispatcher dispatcher, HidGuardianManager hidGuardianManager) : base(model)
         {
@@ -231,11 +232,23 @@ namespace XOutput.UI.Windows
                     changed = true;
                 }
             }
+            
+            int count = 1;
+            DisplayNames.Clear();
             foreach (var instance in instances)
             {
                 if (!Model.Inputs.Select(c => c.ViewModel.Model.Device).OfType<DirectDevice>().Any(d => d.Id == instance.InstanceGuid))
                 {
-                    var device = directInputDevices.CreateDirectDevice(instance);
+                    // Calculate display name and add to list
+                    string baseName = $"{instance.ProductName} {count}";
+                    while (DisplayNames.Contains(baseName))
+                    {
+                        baseName = $"{instance.ProductName} {count}";
+                        count++;
+                    }
+                    DisplayNames.Add(baseName);
+                    
+                    var device = directInputDevices.CreateDirectDevice(instance, baseName);
                     if (device == null)
                     {
                         continue;
