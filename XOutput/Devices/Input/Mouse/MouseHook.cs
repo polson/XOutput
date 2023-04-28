@@ -30,7 +30,7 @@ namespace XOutput.Devices.Input.Mouse
                 }
                 return NativeMethods.CallNextHookEx(hookPtr, nCode, wParam, lParam);
             };
-            hookPtr = NativeMethods.SetWindowsHookEx(HookType.WH_MOUSE_LL, hook, Marshal.GetHINSTANCE(Assembly.GetExecutingAssembly().GetModules()[0]), 0);
+            hookPtr = NativeMethods.SetWindowsHookEx(HookType.WH_MOUSE_LL, hook, NativeMethods.GetModuleHandle(null), 0);
             if (hookPtr == IntPtr.Zero)
             {
                 throw new Win32Exception("Unable to set MouseHook");
@@ -99,6 +99,9 @@ namespace XOutput.Devices.Input.Mouse
 
     internal class NativeMethods
     {
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern IntPtr GetModuleHandle(string lpModuleName);
+        
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr SetWindowsHookEx(HookType hookType, HookProc callback, IntPtr hMod, uint dwThreadId);
 

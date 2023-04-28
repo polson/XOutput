@@ -29,7 +29,7 @@ namespace XOutput
             dependencyEmbedder.AddPackage("Hardcodet.Wpf.TaskbarNotification");
             dependencyEmbedder.AddPackage("Nefarius.ViGEm.Client");
             dependencyEmbedder.Initialize();
-            string exePath = Assembly.GetExecutingAssembly().Location;
+            string exePath = System.AppContext.BaseDirectory;
             string cwd = Path.GetDirectoryName(exePath);
             Directory.SetCurrentDirectory(cwd);
 

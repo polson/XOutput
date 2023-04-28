@@ -217,48 +217,50 @@ namespace XOutput.UI.Windows
 
         public void RefreshGameControllers()
         {
-            IEnumerable<SharpDX.DirectInput.DeviceInstance> instances = directInputDevices.GetInputDevices(Model.AllDevices);
+            IEnumerable<SharpDX.DirectInput.DeviceInstance> dinputDevices = directInputDevices.GetInputDevices(Model.AllDevices);
 
             bool changed = false;
+            var deviceInstances = dinputDevices.ToList();
+
             foreach (var inputView in Model.Inputs.ToArray())
             {
-                var device = inputView.ViewModel.Model.Device;
-                if (device is DirectDevice && (!instances.Any(x => x.InstanceGuid == ((DirectDevice)device).Id) || !device.Connected))
-                {
-                    Model.Inputs.Remove(inputView);
-                    InputDevices.Instance.Remove(device);
-                    inputView.ViewModel.Dispose();
-                    device.Dispose();
-                    changed = true;
-                }
+                var modelDevice = inputView.ViewModel.Model.Device;
+                if (modelDevice is not DirectDevice ||
+                    (deviceInstances.Any(x => x.InstanceGuid == ((DirectDevice)modelDevice).Id))) continue;
+                
+                Model.Inputs.Remove(inputView);
+                InputDevices.Instance.Remove(modelDevice);
+                inputView.ViewModel.Dispose();
+                modelDevice.Dispose();
+                DisplayNames.Remove(modelDevice.DisplayName);
+                changed = true;
             }
             
-            int count = 1;
-            DisplayNames.Clear();
-            foreach (var instance in instances)
+            foreach (var dinputDevice in deviceInstances)
             {
-                if (!Model.Inputs.Select(c => c.ViewModel.Model.Device).OfType<DirectDevice>().Any(d => d.Id == instance.InstanceGuid))
+                //Check if Model.Inputs already contains this device, if so ignore
+                if (Model.Inputs.Select(c => c.ViewModel.Model.Device).OfType<DirectDevice>().Any(modelDevice => modelDevice.Id == dinputDevice.InstanceGuid)) continue;
+                
+                // Calculate display name and add to list
+                int count = 1;
+                string baseName = $"{dinputDevice.ProductName} {count}";
+                while (DisplayNames.Contains(baseName))
                 {
-                    // Calculate display name and add to list
-                    string baseName = $"{instance.ProductName} {count}";
-                    while (DisplayNames.Contains(baseName))
-                    {
-                        baseName = $"{instance.ProductName} {count}";
-                        count++;
-                    }
-                    DisplayNames.Add(baseName);
-                    
-                    var device = directInputDevices.CreateDirectDevice(instance, baseName);
-                    if (device == null)
-                    {
-                        continue;
-                    }
-                    InputConfig inputConfig = settings.GetOrCreateInputConfiguration(device.ToString(), device.InputConfiguration);
-                    device.Disconnected -= DispatchRefreshGameControllers;
-                    device.Disconnected += DispatchRefreshGameControllers;
-                    Model.Inputs.Add(new InputView(new InputViewModel(new InputModel(), device, Model.IsAdmin)));
-                    changed = true;
+                    baseName = $"{dinputDevice.ProductName} {count}";
+                    count++;
                 }
+                DisplayNames.Add(baseName);
+                    
+                var device = directInputDevices.CreateDirectDevice(dinputDevice, baseName);
+                if (device == null)
+                {
+                    continue;
+                }
+                InputConfig inputConfig = settings.GetOrCreateInputConfiguration(device.ToString(), device.InputConfiguration);
+                device.Disconnected -= DispatchRefreshGameControllers;
+                device.Disconnected += DispatchRefreshGameControllers;
+                Model.Inputs.Add(new InputView(new InputViewModel(new InputModel(), device, Model.IsAdmin)));
+                changed = true;
             }
             if (changed)
             {
