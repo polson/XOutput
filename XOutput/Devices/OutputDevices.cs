@@ -20,7 +20,7 @@ namespace XOutput.Devices
         private readonly List<int> ids = new List<int>();
         private readonly object lockObject = new object();
         private readonly List<IXOutputInterface> outputDevices = new List<IXOutputInterface>();
-        public const int MaxOutputDevices = 4;
+        public const int MaxOutputDevices = 8;
         
         private OutputDevices()
         {
