@@ -10,58 +10,74 @@
         Loaded="WindowLoaded">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" MinWidth="200"/>
-            <ColumnDefinition Width="*" MinWidth="200"/>
+            <ColumnDefinition Width="*" MinWidth="200" />
+            <ColumnDefinition Width="*" MinWidth="200" />
         </Grid.ColumnDefinitions>
         <!--Direct Input-->
-        <GroupBox Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='DirectInput'}">
+        <GroupBox
+            Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='DirectInput'}">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <GroupBox Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='Axes'}" 
-                              Visibility="{Binding Model.InputAxisViews, Converter={StaticResource EnumerableNotEmptyToVisibilityConverter}}">
-                        <ItemsControl ItemsSource="{Binding Model.InputAxisViews}" ItemsPanel="{StaticResource VerticalStackPanel}"/>
+                    <GroupBox
+                        Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='Axes'}"
+                        Visibility="{Binding Model.InputAxisViews, Converter={StaticResource EnumerableNotEmptyToVisibilityConverter}}">
+                        <ItemsControl ItemsSource="{Binding Model.InputAxisViews}"
+                                      ItemsPanel="{StaticResource VerticalStackPanel}" />
                     </GroupBox>
-                    <GroupBox Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='DPad'}" 
-                              Visibility="{Binding Model.InputDPadViews, Converter={StaticResource EnumerableNotEmptyToVisibilityConverter}}">
-                        <ItemsControl ItemsSource="{Binding Model.InputDPadViews}" ItemsPanel="{StaticResource VerticalStackPanel}"/>
+                    <GroupBox
+                        Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='DPad'}"
+                        Visibility="{Binding Model.InputDPadViews, Converter={StaticResource EnumerableNotEmptyToVisibilityConverter}}">
+                        <ItemsControl ItemsSource="{Binding Model.InputDPadViews}"
+                                      ItemsPanel="{StaticResource VerticalStackPanel}" />
                     </GroupBox>
-                    <GroupBox Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='Buttons'}">
-                        <ItemsControl ItemsSource="{Binding Model.InputButtonViews}" ItemsPanel="{StaticResource VerticalStackPanel}"/>
+                    <GroupBox
+                        Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='Buttons'}">
+                        <ItemsControl ItemsSource="{Binding Model.InputButtonViews}"
+                                      ItemsPanel="{StaticResource VerticalStackPanel}" />
                     </GroupBox>
                 </StackPanel>
             </ScrollViewer>
         </GroupBox>
         <GridSplitter Grid.Column="0" Width="5" />
         <!--Mapping-->
-        <GroupBox Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='SettingsMenu'}" Grid.Column="1">
+        <GroupBox
+            Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='SettingsMenu'}"
+            Grid.Column="1">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <GroupBox Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='ForceFeedback'}">
+                    <GroupBox
+                        Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='ForceFeedback'}">
                         <StackPanel>
-                            <Label Visibility="{Binding Model.ForceFeedbackAvailable, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={StaticResource True}}">
+                            <Label
+                                Visibility="{Binding Model.ForceFeedbackAvailable, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={StaticResource True}}">
                                 <MultiBinding Converter="{StaticResource DynamicLanguageConverter}">
-                                    <Binding Path="LanguageModel.Data"/>
-                                    <Binding Path="Model.ForceFeedbackText"/>
+                                    <Binding Path="LanguageModel.Data" />
+                                    <Binding Path="Model.ForceFeedbackText" />
                                 </MultiBinding>
                             </Label>
-                            <StackPanel Orientation="Vertical" Visibility="{Binding Model.ForceFeedbackAvailable, Converter={StaticResource BoolToVisibilityConverter}}">
-                                <CheckBox Margin="5" Content="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='ForceFeedback'}"
-                                      IsEnabled="{Binding Model.ForceFeedbackAvailable}" IsChecked="{Binding Model.ForceFeedbackEnabled}"
-                                      Checked="ForceFeedbackCheckBoxChecked" Unchecked="ForceFeedbackCheckBoxChecked"/>
+                            <StackPanel Orientation="Vertical"
+                                        Visibility="{Binding Model.ForceFeedbackAvailable, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <CheckBox Margin="5"
+                                          Content="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='ForceFeedback'}"
+                                          IsEnabled="{Binding Model.ForceFeedbackAvailable}"
+                                          IsChecked="{Binding Model.ForceFeedbackEnabled}"
+                                          Checked="ForceFeedbackCheckBoxChecked"
+                                          Unchecked="ForceFeedbackCheckBoxChecked" />
                                 <StackPanel Orientation="Horizontal">
-                                    <Label Content="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='Test'}"/>
+                                    <Label
+                                        Content="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='Test'}" />
                                     <Button Click="ForceFeedbackButtonClick">
                                         <Button.IsEnabled>
                                             <MultiBinding Converter="{StaticResource AllConverter}">
-                                                <Binding Path="Model.ForceFeedbackEnabled"/>
-                                                <Binding Path="Model.ForceFeedbackAvailable"/>
+                                                <Binding Path="Model.ForceFeedbackEnabled" />
+                                                <Binding Path="Model.ForceFeedbackAvailable" />
                                             </MultiBinding>
                                         </Button.IsEnabled>
                                         <TextBlock Margin="10 0">
                                             <TextBlock.Text>
                                                 <MultiBinding Converter="{StaticResource DynamicLanguageConverter}">
-                                                    <Binding Path="LanguageModel.Data"/>
-                                                    <Binding Path="Model.TestButtonText"/>
+                                                    <Binding Path="LanguageModel.Data" />
+                                                    <Binding Path="Model.TestButtonText" />
                                                 </MultiBinding>
                                             </TextBlock.Text>
                                         </TextBlock>

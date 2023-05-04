@@ -1,33 +1,34 @@
 ﻿using XOutput.Devices;
 
-namespace XOutput.UI.Component
+namespace XOutput.UI.Component;
+
+public class ButtonModel : ModelBase
 {
-    public class ButtonModel : ModelBase
+    private InputSource type;
+    private bool value;
+
+    public InputSource Type
     {
-        private InputSource type;
-        public InputSource Type
+        get => type;
+        set
         {
-            get => type;
-            set
+            if (type != value)
             {
-                if (type != value)
-                {
-                    type = value;
-                    OnPropertyChanged(nameof(Type));
-                }
+                type = value;
+                OnPropertyChanged(nameof(Type));
             }
         }
-        private bool value;
-        public bool Value
+    }
+
+    public bool Value
+    {
+        get => value;
+        set
         {
-            get => value;
-            set
+            if (this.value != value)
             {
-                if (this.value != value)
-                {
-                    this.value = value;
-                    OnPropertyChanged(nameof(Value));
-                }
+                this.value = value;
+                OnPropertyChanged(nameof(Value));
             }
         }
     }

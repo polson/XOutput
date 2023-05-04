@@ -1,10 +1,8 @@
-﻿namespace XOutput.UI.Component
-{
-    public class XBoxViewModel : ViewModelBase<XBoxModel>
-    {
-        public XBoxViewModel(XBoxModel model) : base(model)
-        {
+﻿namespace XOutput.UI.Component;
 
-        }
+public class XBoxViewModel : ViewModelBase<XBoxModel>
+{
+    public XBoxViewModel(XBoxModel model) : base(model)
+    {
     }
 }

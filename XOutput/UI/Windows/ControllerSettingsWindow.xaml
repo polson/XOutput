@@ -10,31 +10,47 @@
         Loaded="WindowLoaded">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*" MinWidth="710"/>
-            <ColumnDefinition Width="*" MinWidth="200"/>
+            <ColumnDefinition Width="3*" MinWidth="710" />
+            <ColumnDefinition Width="*" MinWidth="200" />
         </Grid.ColumnDefinitions>
         <!--Mapping-->
-        <GroupBox Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='Mapping'}" Grid.Column="0">
+        <GroupBox
+            Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='Mapping'}"
+            Grid.Column="0">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <GroupBox Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='Axes'}">
-                        <ItemsControl ItemsSource="{Binding Model.MapperAxisViews}" ItemsPanel="{StaticResource VerticalStackPanel}" Focusable="False"/>
+                    <GroupBox
+                        Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='Axes'}">
+                        <ItemsControl ItemsSource="{Binding Model.MapperAxisViews}"
+                                      ItemsPanel="{StaticResource VerticalStackPanel}" Focusable="False" />
                     </GroupBox>
-                    <GroupBox Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='DPad'}">
-                        <ItemsControl ItemsSource="{Binding Model.MapperDPadViews}" ItemsPanel="{StaticResource VerticalStackPanel}" Focusable="False"/>
+                    <GroupBox
+                        Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='DPad'}">
+                        <ItemsControl ItemsSource="{Binding Model.MapperDPadViews}"
+                                      ItemsPanel="{StaticResource VerticalStackPanel}" Focusable="False" />
                     </GroupBox>
-                    <GroupBox Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='Buttons'}">
-                        <ItemsControl ItemsSource="{Binding Model.MapperButtonViews}" ItemsPanel="{StaticResource VerticalStackPanel}" Focusable="False"/>
+                    <GroupBox
+                        Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='Buttons'}">
+                        <ItemsControl ItemsSource="{Binding Model.MapperButtonViews}"
+                                      ItemsPanel="{StaticResource VerticalStackPanel}" Focusable="False" />
                     </GroupBox>
-                    <GroupBox Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='ForceFeedback'}">
-                        <ComboBox ItemsSource="{Binding Model.ForceFeedbacks}" SelectedItem="{Binding Model.ForceFeedback}" SelectionChanged="ComboBox_SelectionChanged"/>
+                    <GroupBox
+                        Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='ForceFeedback'}">
+                        <ComboBox ItemsSource="{Binding Model.ForceFeedbacks}"
+                                  SelectedItem="{Binding Model.ForceFeedback}"
+                                  SelectionChanged="ComboBox_SelectionChanged" />
                     </GroupBox>
-                    <GroupBox Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='OtherSettings'}">
+                    <GroupBox
+                        Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='OtherSettings'}">
                         <StackPanel>
-                            <TextBox Text="{Binding Model.Title, UpdateSourceTrigger=PropertyChanged}" TextChanged="TextBox_TextChanged"/>
-                            <CheckBox Margin="5" Content="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='StartWhenConnected'}"
-                                      IsChecked="{Binding Model.StartWhenConnected}" Checked="CheckBoxChecked" Unchecked="CheckBoxChecked"/>
-                            <Button Height="30" Margin="5" Click="ConfigureAllButtonClick" Content="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='ConfigureAll'}"/>
+                            <TextBox Text="{Binding Model.Title, UpdateSourceTrigger=PropertyChanged}"
+                                     TextChanged="TextBox_TextChanged" />
+                            <CheckBox Margin="5"
+                                      Content="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='StartWhenConnected'}"
+                                      IsChecked="{Binding Model.StartWhenConnected}" Checked="CheckBoxChecked"
+                                      Unchecked="CheckBoxChecked" />
+                            <Button Height="30" Margin="5" Click="ConfigureAllButtonClick"
+                                    Content="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='ConfigureAll'}" />
                         </StackPanel>
                     </GroupBox>
                 </StackPanel>
@@ -42,17 +58,25 @@
         </GroupBox>
         <GridSplitter Grid.Column="0" Width="5" />
         <!--XInput-->
-        <GroupBox Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='XInput'}" Grid.Column="2">
+        <GroupBox
+            Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='XInput'}"
+            Grid.Column="2">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <GroupBox Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='Axes'}">
-                        <ItemsControl ItemsSource="{Binding Model.XInputAxisViews}" ItemsPanel="{StaticResource VerticalStackPanel}" Focusable="False"/>
+                    <GroupBox
+                        Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='Axes'}">
+                        <ItemsControl ItemsSource="{Binding Model.XInputAxisViews}"
+                                      ItemsPanel="{StaticResource VerticalStackPanel}" Focusable="False" />
                     </GroupBox>
-                    <GroupBox Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='DPad'}">
-                        <ItemsControl ItemsSource="{Binding Model.XInputDPadViews}" ItemsPanel="{StaticResource VerticalStackPanel}" Focusable="False"/>
+                    <GroupBox
+                        Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='DPad'}">
+                        <ItemsControl ItemsSource="{Binding Model.XInputDPadViews}"
+                                      ItemsPanel="{StaticResource VerticalStackPanel}" Focusable="False" />
                     </GroupBox>
-                    <GroupBox Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='Buttons'}">
-                        <ItemsControl ItemsSource="{Binding Model.XInputButtonViews}" ItemsPanel="{StaticResource VerticalStackPanel}" Focusable="False"/>
+                    <GroupBox
+                        Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='Buttons'}">
+                        <ItemsControl ItemsSource="{Binding Model.XInputButtonViews}"
+                                      ItemsPanel="{StaticResource VerticalStackPanel}" Focusable="False" />
                     </GroupBox>
                 </StackPanel>
             </ScrollViewer>

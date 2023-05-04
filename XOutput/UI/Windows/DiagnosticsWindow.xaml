@@ -6,8 +6,10 @@
         xmlns:local="clr-namespace:XOutput.UI.Windows"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=local:DiagnosticsViewModel, IsDesignTimeCreatable=False}"
-        Title="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='DiagnosticsMenu'}" Height="750" Width="550">
+        Title="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='DiagnosticsMenu'}"
+        Height="750" Width="550">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <ItemsControl Margin="5" ItemsPanel="{StaticResource VerticalStackPanel}" ItemsSource="{Binding Model.Diagnostics}"/>
+        <ItemsControl Margin="5" ItemsPanel="{StaticResource VerticalStackPanel}"
+                      ItemsSource="{Binding Model.Diagnostics}" />
     </ScrollViewer>
 </Window>

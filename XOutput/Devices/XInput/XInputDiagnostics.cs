@@ -2,68 +2,69 @@
 using XOutput.Devices.XInput.Vigem;
 using XOutput.Diagnostics;
 
-namespace XOutput.Devices.XInput
+namespace XOutput.Devices.XInput;
+
+/// <summary>
+///     Tests the XInput emulation devices.
+/// </summary>
+public class XInputDiagnostics : IDiagnostics
 {
     /// <summary>
-    /// Tests the XInput emulation devices.
+    ///     Returns null as no object can be associated with this test.
+    ///     <para>Implements <see cref="IDiagnostics.Source" /></para>
     /// </summary>
-    public class XInputDiagnostics : IDiagnostics
+    public object Source => null;
+
+    /// <summary>
+    ///     <para>Implements <see cref="IDiagnostics.GetResults()" /></para>
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<DiagnosticsResult> GetResults()
     {
-        /// <summary>
-        /// Returns null as no object can be associated with this test.
-        /// <para>Implements <see cref="IDiagnostics.Source"/></para>
-        /// </summary>
-        public object Source => null;
-
-        /// <summary>
-        /// <para>Implements <see cref="IDiagnostics.GetResults()"/></para>
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<DiagnosticsResult> GetResults()
+        return new[]
         {
-            return new DiagnosticsResult[]
-            {
-                GetVigemDeviceResult(),
-                GetXDeviceResult(),
-            };
+            GetVigemDeviceResult(),
+            GetXDeviceResult()
+        };
+    }
+
+    public DiagnosticsResult GetXDeviceResult()
+    {
+        var result = new DiagnosticsResult
+        {
+            Type = XInputDiagnosticsTypes.XDevice
+        };
+        if (GetVigemDeviceResult().State != DiagnosticsResultState.Passed)
+        {
+            result.Value = false;
+            result.State = DiagnosticsResultState.Failed;
+        }
+        else
+        {
+            result.Value = true;
+            result.State = DiagnosticsResultState.Passed;
         }
 
-        public DiagnosticsResult GetXDeviceResult()
+        return result;
+    }
+
+    public DiagnosticsResult GetVigemDeviceResult()
+    {
+        var result = new DiagnosticsResult
         {
-            DiagnosticsResult result = new DiagnosticsResult
-            {
-                Type = XInputDiagnosticsTypes.XDevice,
-            };
-            if (GetVigemDeviceResult().State != DiagnosticsResultState.Passed)
-            {
-                result.Value = false;
-                result.State = DiagnosticsResultState.Failed;
-            }
-            else
-            {
-                result.Value = true;
-                result.State = DiagnosticsResultState.Passed;
-            }
-            return result;
+            Type = XInputDiagnosticsTypes.VigemDevice
+        };
+        if (VigemDevice.IsAvailable())
+        {
+            result.Value = true;
+            result.State = DiagnosticsResultState.Passed;
+        }
+        else
+        {
+            result.Value = false;
+            result.State = DiagnosticsResultState.Warning;
         }
 
-        public DiagnosticsResult GetVigemDeviceResult()
-        {
-            DiagnosticsResult result = new DiagnosticsResult
-            {
-                Type = XInputDiagnosticsTypes.VigemDevice,
-            };
-            if (VigemDevice.IsAvailable())
-            {
-                result.Value = true;
-                result.State = DiagnosticsResultState.Passed;
-            }
-            else
-            {
-                result.Value = false;
-                result.State = DiagnosticsResultState.Warning;
-            }
-            return result;
-        }
+        return result;
     }
 }

@@ -4,53 +4,47 @@ using XOutput.Devices.XInput;
 using XOutput.Devices.XInput.Vigem;
 using XOutput.Logging;
 
-namespace XOutput.Devices
+namespace XOutput.Devices;
+
+public class OutputDevices
 {
-    public class OutputDevices
+    public const int MaxOutputDevices = 4;
+    private static readonly ILogger logger = LoggerFactory.GetLogger(typeof(OutputDevices));
+
+    private readonly List<IXOutputInterface> outputDevices = new();
+
+    private OutputDevices()
     {
-        private static readonly ILogger logger = LoggerFactory.GetLogger(typeof(OutputDevices));
+        InitializeDevices();
+    }
 
-        public static OutputDevices Instance { get; } = new();
+    public static OutputDevices Instance { get; } = new();
 
-        private readonly List<IXOutputInterface> outputDevices = new();
-        public const int MaxOutputDevices = 4;
-        
-        private OutputDevices()
+    private void InitializeDevices()
+    {
+        if (outputDevices.Any()) return;
+        for (var i = 0; i < MaxOutputDevices; i++)
         {
-            InitializeDevices();
+            var device = CreateDevice();
+            device.Plugin(i);
+            outputDevices.Add(device);
+        }
+    }
+
+    private IXOutputInterface CreateDevice()
+    {
+        if (VigemDevice.IsAvailable())
+        {
+            logger.Info("ViGEm devices are used.");
+            return new VigemDevice();
         }
 
-        private void InitializeDevices()
-        {
-            if (outputDevices.Any())
-            {
-                return;
-            }
-            for (var i = 0; i < MaxOutputDevices; i++)
-            {
-                var device = CreateDevice();
-                device.Plugin(i);
-                outputDevices.Add(device);
-            }
-        }
+        logger.Error("Neither ViGEm nor SCP devices can be used.");
+        return null;
+    }
 
-        private IXOutputInterface CreateDevice()
-        {
-            if (VigemDevice.IsAvailable())
-            {
-                logger.Info("ViGEm devices are used.");
-                return new VigemDevice();
-            }
-            else
-            {
-                logger.Error("Neither ViGEm nor SCP devices can be used.");
-                return null;
-            }
-        }
-
-        public List<IXOutputInterface> GetDevices()
-        {
-            return outputDevices;
-        }
+    public List<IXOutputInterface> GetDevices()
+    {
+        return outputDevices;
     }
 }

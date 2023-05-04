@@ -1,62 +1,65 @@
 ﻿using XOutput.Devices;
 
-namespace XOutput.UI.Component
+namespace XOutput.UI.Component;
+
+public class DPadModel : ModelBase
 {
-    public class DPadModel : ModelBase
+    private DPadDirection direction;
+
+    private string label;
+
+    private int valuex;
+
+    private int valuey;
+
+    public DPadDirection Direction
     {
-        private DPadDirection direction;
-        public DPadDirection Direction
+        get => direction;
+        set
         {
-            get => direction;
-            set
+            if (direction != value)
             {
-                if (direction != value)
-                {
-                    direction = value;
-                    OnPropertyChanged(nameof(Direction));
-                }
+                direction = value;
+                OnPropertyChanged(nameof(Direction));
             }
         }
+    }
 
-        private int valuex;
-        public int ValueX
+    public int ValueX
+    {
+        get => valuex;
+        set
         {
-            get => valuex;
-            set
+            if (valuex != value)
             {
-                if (valuex != value)
-                {
-                    valuex = value;
-                    OnPropertyChanged(nameof(ValueX));
-                }
+                valuex = value;
+                OnPropertyChanged(nameof(ValueX));
             }
         }
+    }
 
-        private int valuey;
-        public int ValueY
+    public int ValueY
+    {
+        get => valuey;
+        set
         {
-            get => valuey;
-            set
+            if (valuey != value)
             {
-                if (valuey != value)
-                {
-                    valuey = value;
-                    OnPropertyChanged(nameof(ValueY));
-                }
+                valuey = value;
+                OnPropertyChanged(nameof(ValueY));
             }
         }
+    }
 
-        private string label;
-        public string Label
+    public string Label
+    {
+        get => label;
+        set
         {
-            get => label;
-            set
+            if (label != value)
             {
-                if (label != value)
-                {
-                    label = value;
-                    OnPropertyChanged(nameof(Label));
-                }
+                label = value;
+                OnPropertyChanged(nameof(Label));
             }
         }
     }

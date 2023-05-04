@@ -3,55 +3,54 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace XOutput.Logging
+namespace XOutput.Logging;
+
+/// <summary>
+///     Writes logs with the help of <see cref="System.Diagnostics.Trace" />
+/// </summary>
+public class TraceLogger : AbstractLogger
 {
-    /// <summary>
-    /// Writes logs with the help of <see cref="System.Diagnostics.Trace"/>
-    /// </summary>
-    public class TraceLogger : AbstractLogger
+    public const string LogFile = "XOutput.log";
+
+    private Task currentTask;
+
+    static TraceLogger()
     {
-        public const string LogFile = "XOutput.log";
-
-        static TraceLogger()
-        {
-            System.Diagnostics.Trace.AutoFlush = true;
-            if (File.Exists(LogFile))
+        System.Diagnostics.Trace.AutoFlush = true;
+        if (File.Exists(LogFile))
+            try
             {
-                try
-                {
-                    File.Delete(LogFile);
-                }
-                catch {
-                    // if the file is in use, append the file
-                }
+                File.Delete(LogFile);
             }
-            System.Diagnostics.Trace.Listeners.Add(new TextWriterTraceListener(LogFile));
-        }
+            catch
+            {
+                // if the file is in use, append the file
+            }
 
-        private Task currentTask;
+        System.Diagnostics.Trace.Listeners.Add(new TextWriterTraceListener(LogFile));
+    }
 
-        public TraceLogger(Type loggerType, int level) : base(loggerType, level)
-        {
-            currentTask = Task.Run(() => { });
-        }
+    public TraceLogger(Type loggerType, int level) : base(loggerType, level)
+    {
+        currentTask = Task.Run(() => { });
+    }
 
-        /// <summary>
-        /// Writes the log.
-        /// <para>Implements <see cref="AbstractLogger.LogCheck(LogLevel, string, string)"/></para>
-        /// </summary>
-        /// <param name="loglevel">loglevel</param>
-        /// <param name="methodName">name of the caller method</param>
-        /// <param name="log">log text</param>
-        /// <returns></returns>
-        protected override Task Log(LogLevel loglevel, string methodName, string log)
-        {
-            currentTask = currentTask.ContinueWith((t) => DoLog(loglevel, methodName, log));
-            return currentTask;
-        }
+    /// <summary>
+    ///     Writes the log.
+    ///     <para>Implements <see cref="AbstractLogger.LogCheck(LogLevel, string, string)" /></para>
+    /// </summary>
+    /// <param name="loglevel">loglevel</param>
+    /// <param name="methodName">name of the caller method</param>
+    /// <param name="log">log text</param>
+    /// <returns></returns>
+    protected override Task Log(LogLevel loglevel, string methodName, string log)
+    {
+        currentTask = currentTask.ContinueWith(t => DoLog(loglevel, methodName, log));
+        return currentTask;
+    }
 
-        private void DoLog(LogLevel loglevel, string methodName, string log)
-        {
-            System.Diagnostics.Trace.WriteLine(CreatePrefix(DateTime.Now, loglevel, LoggerType.FullName, methodName) + log);
-        }
+    private void DoLog(LogLevel loglevel, string methodName, string log)
+    {
+        System.Diagnostics.Trace.WriteLine(CreatePrefix(DateTime.Now, loglevel, LoggerType.FullName, methodName) + log);
     }
 }

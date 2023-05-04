@@ -1,46 +1,48 @@
 ﻿using XOutput.Devices;
 
-namespace XOutput.UI.Component
+namespace XOutput.UI.Component;
+
+public class AxisModel : ModelBase
 {
-    public class AxisModel : ModelBase
+    private int max;
+    private InputSource type;
+    private int value;
+
+    public InputSource Type
     {
-        private InputSource type;
-        public InputSource Type
+        get => type;
+        set
         {
-            get => type;
-            set
+            if (type != value)
             {
-                if (type != value)
-                {
-                    type = value;
-                    OnPropertyChanged(nameof(Type));
-                }
+                type = value;
+                OnPropertyChanged(nameof(Type));
             }
         }
-        private int value;
-        public int Value
+    }
+
+    public int Value
+    {
+        get => value;
+        set
         {
-            get => value;
-            set
+            if (this.value != value)
             {
-                if (this.value != value)
-                {
-                    this.value = value;
-                    OnPropertyChanged(nameof(AxisModel.Value));
-                }
+                this.value = value;
+                OnPropertyChanged(nameof(Value));
             }
         }
-        private int max;
-        public int Max
+    }
+
+    public int Max
+    {
+        get => max;
+        set
         {
-            get => max;
-            set
+            if (max != value)
             {
-                if (max != value)
-                {
-                    max = value;
-                    OnPropertyChanged(nameof(Max));
-                }
+                max = value;
+                OnPropertyChanged(nameof(Max));
             }
         }
     }

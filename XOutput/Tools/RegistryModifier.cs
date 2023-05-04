@@ -2,119 +2,116 @@
 using Microsoft.Win32;
 using XOutput.Logging;
 
-namespace XOutput.Tools
+namespace XOutput.Tools;
+
+public sealed class RegistryModifier
 {
-    public sealed class RegistryModifier
+    /// <summary>
+    ///     Startup registry key.
+    /// </summary>
+    public const string AutostartRegistry = @"Software\Microsoft\Windows\CurrentVersion\Run";
+
+    /// <summary>
+    ///     XOutput registry value
+    /// </summary>
+    public const string AutostartValueKey = "XOutput";
+
+    /// <summary>
+    ///     Autostart command line parameters.
+    /// </summary>
+    public const string AutostartParams = " --minimized";
+
+    private static readonly ILogger logger = LoggerFactory.GetLogger(typeof(RegistryModifier));
+
+    /// <summary>
+    ///     Gets or sets the autostart.
+    /// </summary>
+    public bool Autostart
     {
-        /// <summary>
-        /// Startup registry key.
-        /// </summary>
-        public const string AutostartRegistry = @"Software\Microsoft\Windows\CurrentVersion\Run";
-        /// <summary>
-        /// XOutput registry value
-        /// </summary>
-        public const string AutostartValueKey = "XOutput";
-        /// <summary>
-        /// Autostart command line parameters.
-        /// </summary>
-        public const string AutostartParams = " --minimized";
-
-        private static readonly ILogger logger = LoggerFactory.GetLogger(typeof(RegistryModifier));
-
-        /// <summary>
-        /// Gets or sets the autostart.
-        /// </summary>
-        public bool Autostart
-        {
-            get
-            {
-                using (var key = GetRegistryKey())
-                {
-                    bool exists = key.GetValue(AutostartValueKey) != null;
-                    logger.Debug($"{AutostartValueKey} registry is " + (exists ? "" : "not ") + "found");
-                    return exists;
-                }
-            }
-            set
-            {
-                if (value)
-                {
-                    SetAutostart();
-                }
-                else
-                {
-                    ClearAutostart();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Activates autostart.
-        /// </summary>
-        public void SetAutostart()
+        get
         {
             using (var key = GetRegistryKey())
             {
-                var filename = Process.GetCurrentProcess().MainModule.FileName;
-                string value = $"\"{filename}\" {AutostartParams}";
-                key.SetValue(AutostartValueKey, value);
-                logger.Debug($"{AutostartValueKey} registry set to {value}");
+                var exists = key.GetValue(AutostartValueKey) != null;
+                logger.Debug($"{AutostartValueKey} registry is " + (exists ? "" : "not ") + "found");
+                return exists;
             }
         }
-
-        /// <summary>
-        /// Deactivates autostart.
-        /// </summary>
-        public void ClearAutostart()
+        set
         {
-            using (var key = GetRegistryKey())
-            {
-                key.DeleteValue(AutostartValueKey);
-                logger.Debug($"{AutostartValueKey} registry is deleted");
-            }
+            if (value)
+                SetAutostart();
+            else
+                ClearAutostart();
         }
+    }
 
-        private static RegistryKey GetRegistryKey(bool writeable = true)
+    /// <summary>
+    ///     Activates autostart.
+    /// </summary>
+    public void SetAutostart()
+    {
+        using (var key = GetRegistryKey())
         {
-            return Registry.CurrentUser.OpenSubKey(AutostartRegistry, writeable);
+            var filename = Process.GetCurrentProcess().MainModule.FileName;
+            var value = $"\"{filename}\" {AutostartParams}";
+            key.SetValue(AutostartValueKey, value);
+            logger.Debug($"{AutostartValueKey} registry set to {value}");
         }
+    }
 
-        public static bool KeyExists(RegistryKey registryKey, string subkey)
+    /// <summary>
+    ///     Deactivates autostart.
+    /// </summary>
+    public void ClearAutostart()
+    {
+        using (var key = GetRegistryKey())
         {
-            using (var registry = registryKey.OpenSubKey(subkey))
-            {
-                return registry != null;
-            }
+            key.DeleteValue(AutostartValueKey);
+            logger.Debug($"{AutostartValueKey} registry is deleted");
         }
+    }
 
-        public static void DeleteTree(RegistryKey registryKey, string subkey)
-        {
-            registryKey.DeleteSubKeyTree(subkey, false);
-            registryKey.Close();
-        }
+    private static RegistryKey GetRegistryKey(bool writeable = true)
+    {
+        return Registry.CurrentUser.OpenSubKey(AutostartRegistry, writeable);
+    }
 
-        public static void CreateKey(RegistryKey registryKey, string subkey)
+    public static bool KeyExists(RegistryKey registryKey, string subkey)
+    {
+        using (var registry = registryKey.OpenSubKey(subkey))
         {
-            var registry = registryKey.CreateSubKey(subkey);
-            registry.Close();
+            return registry != null;
         }
+    }
 
-        public static object GetValue(RegistryKey registryKey, string subkey, string key)
-        {
-            return registryKey.OpenSubKey(subkey).GetValue(key);
-        }
+    public static void DeleteTree(RegistryKey registryKey, string subkey)
+    {
+        registryKey.DeleteSubKeyTree(subkey, false);
+        registryKey.Close();
+    }
 
-        public static void SetValue(RegistryKey registryKey, string subkey, string key, object value)
-        {
-            using (var registry = registryKey.OpenSubKey(subkey, true))
-            {
-                registry.SetValue(key, value);
-            }
-        }
+    public static void CreateKey(RegistryKey registryKey, string subkey)
+    {
+        var registry = registryKey.CreateSubKey(subkey);
+        registry.Close();
+    }
 
-        public static string[] GetSubKeyNames(RegistryKey registryKey, string subkey)
+    public static object GetValue(RegistryKey registryKey, string subkey, string key)
+    {
+        return registryKey.OpenSubKey(subkey).GetValue(key);
+    }
+
+    public static void SetValue(RegistryKey registryKey, string subkey, string key, object value)
+    {
+        using (var registry = registryKey.OpenSubKey(subkey, true))
         {
-            return registryKey.OpenSubKey(subkey).GetSubKeyNames();
+            registry.SetValue(key, value);
         }
+    }
+
+    public static string[] GetSubKeyNames(RegistryKey registryKey, string subkey)
+    {
+        return registryKey.OpenSubKey(subkey).GetSubKeyNames();
     }
 }

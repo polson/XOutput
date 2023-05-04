@@ -1,99 +1,104 @@
 ﻿using System.Windows.Media;
 using XOutput.Devices;
 
-namespace XOutput.UI.Component
+namespace XOutput.UI.Component;
+
+public class ControllerModel : ModelBase
 {
-    public class ControllerModel : ModelBase
+    private Brush background;
+
+    private string buttonText;
+
+    private bool canStart;
+    private GameController controller;
+
+    private int selectedOutputIndex;
+    private bool started;
+
+    public GameController Controller
     {
-        private GameController controller;
-        public GameController Controller
+        get => controller;
+        set
         {
-            get => controller;
-            set
+            if (controller != value)
             {
-                if (controller != value)
-                {
-                    controller = value;
-                    OnPropertyChanged(nameof(Controller));
-                }
+                controller = value;
+                OnPropertyChanged(nameof(Controller));
             }
         }
+    }
 
-        private string buttonText;
-        public string ButtonText
+    public string ButtonText
+    {
+        get => buttonText;
+        set
         {
-            get => buttonText;
-            set
+            if (buttonText != value)
             {
-                if (buttonText != value)
-                {
-                    buttonText = value;
-                    OnPropertyChanged(nameof(ButtonText));
-                }
+                buttonText = value;
+                OnPropertyChanged(nameof(ButtonText));
             }
         }
-        private bool started;
-        public bool Started
+    }
+
+    public bool Started
+    {
+        get => started;
+        set
         {
-            get => started;
-            set
+            if (started != value)
             {
-                if (started != value)
-                {
-                    started = value;
-                    OnPropertyChanged(nameof(Started));
-                }
+                started = value;
+                OnPropertyChanged(nameof(Started));
             }
         }
+    }
 
-        private bool canStart;
-        public bool CanStart
+    public bool CanStart
+    {
+        get => canStart;
+        set
         {
-            get => canStart;
-            set
+            if (canStart != value)
             {
-                if (canStart != value)
-                {
-                    canStart = value;
-                    OnPropertyChanged(nameof(CanStart));
-                }
+                canStart = value;
+                OnPropertyChanged(nameof(CanStart));
             }
         }
+    }
 
-        private Brush background;
-        public Brush Background
+    public Brush Background
+    {
+        get => background;
+        set
         {
-            get => background;
-            set
+            if (background != value)
             {
-                if (background != value)
-                {
-                    background = value;
-                    OnPropertyChanged(nameof(Background));
-                }
+                background = value;
+                OnPropertyChanged(nameof(Background));
             }
         }
-        public string DisplayName { get { return Controller.ToString(); } }
+    }
 
-        private int selectedOutputIndex;
-        public int SelectedOutputIndex
+    public string DisplayName => Controller.ToString();
+
+    public int SelectedOutputIndex
+    {
+        // get => OutputDevices.Instance.GetDevices().IndexOf(controller.XOutputInterface);
+        get => selectedOutputIndex;
+        set
         {
-            // get => OutputDevices.Instance.GetDevices().IndexOf(controller.XOutputInterface);
-            get => selectedOutputIndex;
-            set
+            if (selectedOutputIndex != value)
             {
-                if (selectedOutputIndex != value)
-                {
-                    selectedOutputIndex = value;
-                    OnPropertyChanged(nameof(SelectedOutputIndex));
-                }
+                selectedOutputIndex = value;
+                OnPropertyChanged(nameof(SelectedOutputIndex));
             }
         }
+    }
 
 
-        public void RefreshName()
-        {
-            OnPropertyChanged(nameof(DisplayName));
-        }
+    public void RefreshName()
+    {
+        OnPropertyChanged(nameof(DisplayName));
     }
 }

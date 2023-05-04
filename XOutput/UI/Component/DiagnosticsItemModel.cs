@@ -1,24 +1,22 @@
 ﻿using System.Collections.ObjectModel;
 using XOutput.Diagnostics;
 
-namespace XOutput.UI
-{
-    public class DiagnosticsItemModel : ModelBase
-    {
-        private readonly ObservableCollection<DiagnosticsResult> results = new ObservableCollection<DiagnosticsResult>();
-        public ObservableCollection<DiagnosticsResult> Results => results;
+namespace XOutput.UI;
 
-        private string source;
-        public string Source
+public class DiagnosticsItemModel : ModelBase
+{
+    private string source;
+    public ObservableCollection<DiagnosticsResult> Results { get; } = new();
+
+    public string Source
+    {
+        get => source;
+        set
         {
-            get => source;
-            set
+            if (source != value)
             {
-                if (source != value)
-                {
-                    source = value;
-                    OnPropertyChanged(nameof(Source));
-                }
+                source = value;
+                OnPropertyChanged(nameof(Source));
             }
         }
     }

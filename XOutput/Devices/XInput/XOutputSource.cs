@@ -1,31 +1,28 @@
 ﻿using XOutput.Devices.Mapper;
 
-namespace XOutput.Devices.XInput
+namespace XOutput.Devices.XInput;
+
+/// <summary>
+///     Direct input source.
+/// </summary>
+public class XOutputSource : InputSource
 {
-    /// <summary>
-    /// Direct input source.
-    /// </summary>
-    public class XOutputSource : InputSource
+    public XOutputSource(string name, XInputTypes type) : base(null, name, type.GetInputSourceType(), 0)
     {
-        public XInputTypes XInputType => inputType;
+        XInputType = type;
+    }
 
-        private readonly XInputTypes inputType;
+    public XInputTypes XInputType { get; }
 
-
-        public XOutputSource(string name, XInputTypes type) : base(null, name, type.GetInputSourceType(), 0)
+    internal bool Refresh(InputMapper mapper)
+    {
+        var mappingCollection = mapper.GetMapping(XInputType);
+        if (mappingCollection != null)
         {
-            inputType = type;
+            var newValue = mappingCollection.GetValue(XInputType);
+            return RefreshValue(newValue);
         }
 
-        internal bool Refresh(InputMapper mapper)
-        {
-            var mappingCollection = mapper.GetMapping(inputType);
-            if (mappingCollection != null)
-            {
-                double newValue = mappingCollection.GetValue(inputType);
-                return RefreshValue(newValue);
-            }
-            return false;
-        }
+        return false;
     }
 }
