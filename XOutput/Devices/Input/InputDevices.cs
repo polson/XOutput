@@ -4,16 +4,14 @@ namespace XOutput.Devices.Input
 {
     public class InputDevices
     {
-
-        private static InputDevices instance = new InputDevices();
         /// <summary>
         /// Gets the singleton instance of the class.
         /// </summary>
-        public static InputDevices Instance => instance;
+        public static InputDevices Instance { get; } = new();
 
-        private readonly List<IInputDevice> inputDevices = new List<IInputDevice>();
+        private readonly List<IInputDevice> inputDevices = new();
 
-        protected InputDevices()
+        private InputDevices()
         {
 
         }

@@ -1,4 +1,5 @@
-﻿using XOutput.Devices;
+﻿using System.Windows;
+using XOutput.Devices;
 using XOutput.Devices.Input;
 using XOutput.Devices.Mapper;
 using XOutput.Devices.XInput;
@@ -49,16 +50,16 @@ namespace XOutput.UI.Component
             if (Helper.DoubleEquals(mapperData.MinValue, Model.XInputType.GetDisableValue()) && Helper.DoubleEquals(mapperData.MaxValue, Model.XInputType.GetDisableValue()))
             {
                 Model.SelectedInput = DisabledInputSource.Instance;
-                Model.ConfigVisibility = System.Windows.Visibility.Collapsed;
+                Model.ConfigVisibility = Visibility.Collapsed;
             }
             else
             {
                 Model.SelectedInput = mapperData.Source;
-                Model.ConfigVisibility = System.Windows.Visibility.Visible;
+                Model.ConfigVisibility = Visibility.Visible;
             }
             if (mapperData.Source == null)
             {
-                Model.ConfigVisibility = System.Windows.Visibility.Collapsed;
+                Model.ConfigVisibility = Visibility.Collapsed;
             }
             else
             {
@@ -72,12 +73,12 @@ namespace XOutput.UI.Component
             {
                 Model.Min = (decimal)(100 * Model.XInputType.GetDisableValue());
                 Model.Max = (decimal)(100 * Model.XInputType.GetDisableValue());
-                Model.ConfigVisibility = System.Windows.Visibility.Collapsed;
+                Model.ConfigVisibility = Visibility.Collapsed;
             }
             else
             {
                 Model.MapperData.Source = type;
-                Model.ConfigVisibility = System.Windows.Visibility.Visible;
+                Model.ConfigVisibility = Visibility.Visible;
             }
             Controllers.Instance.Update(controller, InputDevices.Instance.GetDevices());
         }

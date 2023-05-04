@@ -1,11 +1,10 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using XOutput.Devices.Input;
 using XOutput.Devices.Mapper;
 using XOutput.Devices.XInput;
-using XOutput.Logging;
 
 namespace XOutput.Tools
 {
@@ -33,7 +32,6 @@ namespace XOutput.Tools
 
         public bool CloseToTray { get; set; }
         public bool ShowAll { get; set; }
-        public bool HidGuardianEnabled { get; set; }
         public bool DisableAutoRefresh { get; set; }
         public string Language
         {

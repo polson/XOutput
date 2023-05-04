@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Threading;
 using XOutput.Devices;
 using XOutput.Devices.Input;
@@ -36,13 +36,13 @@ namespace XOutput.UI.Windows
             xInputType = valuesToRead.First();
             if (valuesToRead.Length > 1)
             {
-                Model.ButtonsVisibility = System.Windows.Visibility.Collapsed;
-                Model.TimerVisibility = System.Windows.Visibility.Visible;
+                Model.ButtonsVisibility = Visibility.Collapsed;
+                Model.TimerVisibility = Visibility.Visible;
             }
             else
             {
-                Model.ButtonsVisibility = System.Windows.Visibility.Visible;
-                Model.TimerVisibility = System.Windows.Visibility.Collapsed;
+                Model.ButtonsVisibility = Visibility.Visible;
+                Model.TimerVisibility = Visibility.Collapsed;
             }
             inputTypes = inputDevices.SelectMany(i => i.Sources).ToArray();
             timer.Interval = TimeSpan.FromMilliseconds(BlinkTime);

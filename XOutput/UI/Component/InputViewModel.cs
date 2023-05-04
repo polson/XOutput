@@ -3,7 +3,6 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using XOutput.Devices;
 using XOutput.Devices.Input;
-using XOutput.Tools;
 using XOutput.UI.Windows;
 
 namespace XOutput.UI.Component
@@ -26,8 +25,7 @@ namespace XOutput.UI.Component
 
         public void Edit()
         {
-            HidGuardianManager hidGuardianManager = ApplicationContext.Global.Resolve<HidGuardianManager>();
-            var controllerSettingsWindow = new InputSettingsWindow(new InputSettingsViewModel(new InputSettingsModel(), hidGuardianManager, Model.Device, isAdmin), Model.Device);
+            var controllerSettingsWindow = new InputSettingsWindow(new InputSettingsViewModel(new InputSettingsModel(), Model.Device, isAdmin), Model.Device);
             controllerSettingsWindow.ShowDialog();
         }
 

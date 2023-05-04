@@ -13,6 +13,6 @@
             <ColumnDefinition Width="25"/>
         </Grid.ColumnDefinitions>
         <Label Content="{Binding Model.Type}"/>
-        <Ellipse Grid.Column="1" Fill="{Binding Model.Value, Converter={StaticResource BoolToBrushConverter}}" Width="20" Height="20"></Ellipse>
+        <Ellipse Grid.Column="1" Fill="{Binding Model.Value, Converter={StaticResource BoolToBrushConverter}}" Width="20" Height="20" />
     </Grid>
 </UserControl>

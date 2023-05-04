@@ -31,7 +31,7 @@
                 </StackPanel>
             </ScrollViewer>
         </GroupBox>
-        <GridSplitter Grid.Column="0" Width="5"></GridSplitter>
+        <GridSplitter Grid.Column="0" Width="5" />
         <!--Mapping-->
         <GroupBox Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='SettingsMenu'}" Grid.Column="1">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -70,15 +70,6 @@
                             </StackPanel>
                         </StackPanel>
                     </GroupBox>
-                    <StackPanel>
-                        <StackPanel Visibility="{Binding Model.IsAdmin, Converter={StaticResource BoolToVisibilityConverter}}">
-                            <Button Height="30" Margin="5" Click="AddHidGuardianButtonClick" Content="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='HidGuardianAdd'}"
-                                        Visibility="{Binding Model.HidGuardianAdded, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={StaticResource True}}">
-                            </Button>
-                            <Button Height="30" Margin="5" Click="RemoveHidGuardianButtonClick" Content="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='HidGuardianRemove'}"
-                                        Visibility="{Binding Model.HidGuardianAdded, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                        </StackPanel>
-                    </StackPanel>
                 </StackPanel>
             </ScrollViewer>
         </GroupBox>

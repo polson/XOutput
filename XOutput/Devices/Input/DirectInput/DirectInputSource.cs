@@ -1,5 +1,5 @@
-﻿using SharpDX.DirectInput;
-using System;
+﻿using System;
+using SharpDX.DirectInput;
 
 namespace XOutput.Devices.Input.DirectInput
 {

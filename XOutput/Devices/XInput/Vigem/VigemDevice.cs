@@ -1,9 +1,9 @@
-﻿using Nefarius.ViGEm.Client;
+﻿using System;
+using System.Collections.Generic;
+using Nefarius.ViGEm.Client;
 using Nefarius.ViGEm.Client.Exceptions;
 using Nefarius.ViGEm.Client.Targets;
 using Nefarius.ViGEm.Client.Targets.Xbox360;
-using System;
-using System.Collections.Generic;
 
 namespace XOutput.Devices.XInput.Vigem
 {
@@ -14,7 +14,6 @@ namespace XOutput.Devices.XInput.Vigem
     {
         private readonly ViGEmClient client;
         
-        //There's really only one controller
         private readonly Dictionary<int, IXbox360Controller> controllers = new Dictionary<int, IXbox360Controller>();
         private readonly Dictionary<XInputTypes, VigemXbox360ButtonMapping> buttonMappings = new Dictionary<XInputTypes, VigemXbox360ButtonMapping>();
         private readonly Dictionary<XInputTypes, VigemXbox360AxisMapping> axisMappings = new Dictionary<XInputTypes, VigemXbox360AxisMapping>();

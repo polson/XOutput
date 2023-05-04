@@ -1,12 +1,13 @@
 ﻿using System.Collections.ObjectModel;
+using XOutput.Tools;
 using XOutput.UI.Component;
 
 namespace XOutput.UI.Windows
 {
     public class MainWindowModel : ModelBase
     {
-        private Tools.Settings settings;
-        public Tools.Settings Settings
+        private Settings settings;
+        public Settings Settings
         {
             get => settings;
             set

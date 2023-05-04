@@ -1,6 +1,6 @@
-﻿using Microsoft.Win32;
-using System.Linq;
+﻿using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.Win32;
 
 namespace XOutput.Tools
 {

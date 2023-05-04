@@ -4,27 +4,20 @@ using System.Windows.Threading;
 using XOutput.Devices;
 using XOutput.Devices.Input;
 using XOutput.Devices.XInput.Vigem;
-using XOutput.Tools;
 using XOutput.UI.Component;
 
 namespace XOutput.UI.Windows
 {
     public class InputSettingsViewModel : ViewModelBase<InputSettingsModel>, IDisposable
     {
-        private readonly HidGuardianManager hidGuardianManager;
         private readonly IInputDevice device;
         private readonly DispatcherTimer dispatcherTimer = new DispatcherTimer();
         private int state = 0;
 
-        public InputSettingsViewModel(InputSettingsModel model, HidGuardianManager hidGuardianManager, IInputDevice device, bool isAdmin) : base(model)
+        public InputSettingsViewModel(InputSettingsModel model, IInputDevice device, bool isAdmin) : base(model)
         {
-            this.hidGuardianManager = hidGuardianManager;
             this.device = device;
             Model.IsAdmin = isAdmin && device.HardwareID != null;
-            if (Model.IsAdmin)
-            {
-                Model.HidGuardianAdded = hidGuardianManager.IsAffected(device.HardwareID);
-            }
             Model.Title = device.DisplayName;
             CreateInputControls();
             SetForceFeedback();
@@ -63,24 +56,6 @@ namespace XOutput.UI.Windows
         public void SetForceFeedbackEnabled()
         {
             device.InputConfiguration.ForceFeedback = Model.ForceFeedbackEnabled;
-        }
-
-        public void AddHidGuardian()
-        {
-            hidGuardianManager.AddAffectedDevice(device.HardwareID);
-            if (Model.IsAdmin)
-            {
-                Model.HidGuardianAdded = hidGuardianManager.IsAffected(device.HardwareID);
-            }
-        }
-
-        public void RemoveHidGuardian()
-        {
-            hidGuardianManager.RemoveAffectedDevice(device.HardwareID);
-            if (Model.IsAdmin)
-            {
-                Model.HidGuardianAdded = hidGuardianManager.IsAffected(device.HardwareID);
-            }
         }
 
         private void DispatcherTimerTick(object sender, EventArgs e)

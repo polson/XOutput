@@ -1,7 +1,7 @@
-﻿using SharpDX.DirectInput;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SharpDX.DirectInput;
 using XOutput.Logging;
 
 namespace XOutput.Devices.Input.DirectInput

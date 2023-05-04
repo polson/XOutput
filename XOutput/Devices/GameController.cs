@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using Nefarius.ViGEm.Client.Targets;
+using Nefarius.ViGEm.Client.Targets.Xbox360;
 using XOutput.Devices.Input;
 using XOutput.Devices.Input.DirectInput;
 using XOutput.Devices.Mapper;
 using XOutput.Devices.XInput;
-using XOutput.Devices.XInput.SCPToolkit;
 using XOutput.Devices.XInput.Vigem;
 using XOutput.Logging;
 
@@ -28,10 +29,6 @@ namespace XOutput.Devices
         /// Gets the name of the input device.
         /// </summary>
         public string DisplayName => mapper.Name;
-        /// <summary>
-        /// Gets the number of the controller.
-        /// </summary>
-        public int ControllerCount => controllerCount;
         /// <summary>
         /// Gets if any XInput emulation is installed.
         /// </summary>
@@ -57,7 +54,7 @@ namespace XOutput.Devices
         private Thread thread;
         private bool running;
         private int controllerCount = -1;
-        private Nefarius.ViGEm.Client.Targets.IXbox360Controller controller;
+        private IXbox360Controller controller;
 
         public GameController(InputMapper mapper)
         {
@@ -87,8 +84,8 @@ namespace XOutput.Devices
         public void Dispose()
         {
             Stop();
-            // xInput?.Dispose();
-            // XOutputInterface?.Dispose();
+            xInput?.Dispose();
+            XOutputInterface?.Dispose();
         }
 
         /// <summary>
@@ -174,7 +171,7 @@ namespace XOutput.Devices
             }
         }
 
-        private void ControllerFeedbackReceived(object sender, Nefarius.ViGEm.Client.Targets.Xbox360.Xbox360FeedbackReceivedEventArgs e)
+        private void ControllerFeedbackReceived(object sender, Xbox360FeedbackReceivedEventArgs e)
         {
             ForceFeedbackDevice?.SetForceFeedback((double)e.LargeMotor / byte.MaxValue, (double)e.SmallMotor / byte.MaxValue);
         }

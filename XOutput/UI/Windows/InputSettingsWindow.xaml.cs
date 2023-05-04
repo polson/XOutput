@@ -63,15 +63,5 @@ namespace XOutput.UI.Windows
         {
             viewModel.SetForceFeedbackEnabled();
         }
-
-        private void AddHidGuardianButtonClick(object sender, RoutedEventArgs e)
-        {
-            viewModel.AddHidGuardian();
-        }
-
-        private void RemoveHidGuardianButtonClick(object sender, RoutedEventArgs e)
-        {
-            viewModel.RemoveHidGuardian();
-        }
     }
 }

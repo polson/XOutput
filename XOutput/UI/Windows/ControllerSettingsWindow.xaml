@@ -40,7 +40,7 @@
                 </StackPanel>
             </ScrollViewer>
         </GroupBox>
-        <GridSplitter Grid.Column="0" Width="5"></GridSplitter>
+        <GridSplitter Grid.Column="0" Width="5" />
         <!--XInput-->
         <GroupBox Header="{Binding LanguageModel.Data, Converter={StaticResource LanguageConverter}, ConverterParameter='XInput'}" Grid.Column="2">
             <ScrollViewer VerticalScrollBarVisibility="Auto">

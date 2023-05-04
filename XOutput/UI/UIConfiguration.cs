@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Threading;
+﻿using System.Windows.Threading;
 using XOutput.Tools;
 using XOutput.UI.Windows;
 
@@ -18,9 +13,9 @@ namespace XOutput.UI
         }
 
         [ResolverMethod(false)]
-        public static MainWindowViewModel GetMainWindowViewModel(MainWindowModel model, Dispatcher dispatcher, HidGuardianManager hidGuardianManager)
+        public static MainWindowViewModel GetMainWindowViewModel(MainWindowModel model, Dispatcher dispatcher)
         {
-            return new MainWindowViewModel(model, dispatcher, hidGuardianManager);
+            return new MainWindowViewModel(model, dispatcher);
         }
 
         [ResolverMethod(false)]

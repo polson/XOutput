@@ -1,11 +1,12 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using XOutput.Devices.Input.Mouse;
 using XOutput.Logging;
 using XOutput.Tools;
+using XOutput.UI;
 using XOutput.UI.Windows;
 
 namespace XOutput
@@ -29,14 +30,14 @@ namespace XOutput
             dependencyEmbedder.AddPackage("Hardcodet.Wpf.TaskbarNotification");
             dependencyEmbedder.AddPackage("Nefarius.ViGEm.Client");
             dependencyEmbedder.Initialize();
-            string exePath = System.AppContext.BaseDirectory;
+            string exePath = AppContext.BaseDirectory;
             string cwd = Path.GetDirectoryName(exePath);
             Directory.SetCurrentDirectory(cwd);
 
             ApplicationContext globalContext = ApplicationContext.Global;
             globalContext.Resolvers.Add(Resolver.CreateSingleton(Dispatcher));
             globalContext.AddFromConfiguration(typeof(ApplicationConfiguration));
-            globalContext.AddFromConfiguration(typeof(UI.UIConfiguration));
+            globalContext.AddFromConfiguration(typeof(UIConfiguration));
 
             argumentParser = globalContext.Resolve<ArgumentParser>();
 #if !DEBUG
@@ -60,11 +61,11 @@ namespace XOutput
                 {
                     mainWindow.Show();
                 }
-                ApplicationContext.Global.Resolve<Devices.Input.Mouse.MouseHook>().StartHook();
+                ApplicationContext.Global.Resolve<MouseHook>().StartHook();
             } catch (Exception ex) {
                 logger.Error(ex);
                 MessageBox.Show(ex.ToString());
-                Application.Current.Shutdown();
+                Current.Shutdown();
             }
         }
 

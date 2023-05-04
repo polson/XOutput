@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using XOutput.Devices.Input.Mouse;
 using XOutput.Tools;
-using XOutput.UI.Windows;
 
 namespace XOutput
 {
@@ -16,19 +11,14 @@ namespace XOutput
             return new ArgumentParser();
         }
         [ResolverMethod]
-        public static HidGuardianManager GetHidGuardianManager()
-        {
-            return new HidGuardianManager();
-        }
-        [ResolverMethod]
         public static RegistryModifier GetRegistryModifier()
         {
             return new RegistryModifier();
         }
         [ResolverMethod]
-        public static Devices.Input.Mouse.MouseHook GetMouseHook()
+        public static MouseHook GetMouseHook()
         {
-            return new Devices.Input.Mouse.MouseHook();
+            return new MouseHook();
         }
     }
 }

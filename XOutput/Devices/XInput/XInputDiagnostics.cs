@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using XOutput.Devices.XInput.SCPToolkit;
 using XOutput.Devices.XInput.Vigem;
 using XOutput.Diagnostics;
 
@@ -24,7 +23,6 @@ namespace XOutput.Devices.XInput
         {
             return new DiagnosticsResult[]
             {
-                GetScpDeviceResult(),
                 GetVigemDeviceResult(),
                 GetXDeviceResult(),
             };
@@ -38,40 +36,13 @@ namespace XOutput.Devices.XInput
             };
             if (GetVigemDeviceResult().State != DiagnosticsResultState.Passed)
             {
-                if (GetScpDeviceResult().State != DiagnosticsResultState.Passed)
-                {
-                    result.Value = false;
-                    result.State = DiagnosticsResultState.Failed;
-                }
-                else
-                {
-                    result.Value = true;
-                    result.State = DiagnosticsResultState.Warning;
-                }
-            }
-            else
-            {
-                result.Value = true;
-                result.State = DiagnosticsResultState.Passed;
-            }
-            return result;
-        }
-
-        public DiagnosticsResult GetScpDeviceResult()
-        {
-            DiagnosticsResult result = new DiagnosticsResult
-            {
-                Type = XInputDiagnosticsTypes.ScpDevice,
-            };
-            if (ScpDevice.IsAvailable())
-            {
-                result.Value = true;
-                result.State = DiagnosticsResultState.Passed;
-            }
-            else
-            {
                 result.Value = false;
-                result.State = DiagnosticsResultState.Warning;
+                result.State = DiagnosticsResultState.Failed;
+            }
+            else
+            {
+                result.Value = true;
+                result.State = DiagnosticsResultState.Passed;
             }
             return result;
         }

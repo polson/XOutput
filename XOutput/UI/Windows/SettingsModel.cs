@@ -56,19 +56,6 @@ namespace XOutput.UI.Windows
             }
         }
 
-        public bool HidGuardianEnabled
-        {
-            get => settings.HidGuardianEnabled;
-            set
-            {
-                if (settings.HidGuardianEnabled != value)
-                {
-                    settings.HidGuardianEnabled = value;
-                    OnPropertyChanged(nameof(HidGuardianEnabled));
-                }
-            }
-        }
-
         public bool DisableAutoRefresh
         {
             get => settings.DisableAutoRefresh;

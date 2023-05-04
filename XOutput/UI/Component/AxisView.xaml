@@ -13,6 +13,6 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Label Content="{Binding Model.Type}"/>
-        <ProgressBar Grid.Column="1" Height="6" Value="{Binding Model.Value}" Maximum="{Binding Model.Max}"></ProgressBar>
+        <ProgressBar Grid.Column="1" Height="6" Value="{Binding Model.Value}" Maximum="{Binding Model.Max}" />
     </Grid>
 </UserControl>

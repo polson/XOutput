@@ -1,8 +1,8 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
-using System.Windows.Threading;
 using XOutput.Logging;
 using XOutput.Tools;
 
@@ -123,7 +123,7 @@ namespace XOutput.UI.Windows
             viewModel.AboutPopupShow();
         }
 
-        private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void WindowClosing(object sender, CancelEventArgs e)
         {
             if (viewModel.GetSettings().CloseToTray && !hardExit)
             {

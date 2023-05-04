@@ -1,13 +1,12 @@
-﻿using Microsoft.Win32;
-using SharpDX;
-using SharpDX.DirectInput;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
+using SharpDX;
+using SharpDX.DirectInput;
 using XOutput.Logging;
 using XOutput.Tools;
 
@@ -104,17 +103,16 @@ namespace XOutput.Devices.Input.DirectInput
         }
         #endregion
 
-        private static readonly ILogger logger = LoggerFactory.GetLogger(typeof(DirectDevice));
+        private static readonly ILogger Logger = LoggerFactory.GetLogger(typeof(DirectDevice));
         private readonly DeviceInstance deviceInstance;
         private readonly Joystick joystick;
         private readonly DirectInputSource[] sources;
         private readonly DeviceState state;
-        private readonly EffectInfo force;
-        private readonly List<DirectDeviceForceFeedback> actuators = new List<DirectDeviceForceFeedback>();
+        private readonly List<DirectDeviceForceFeedback> actuators = new();
         private readonly InputConfig inputConfig;
-        private bool connected = false;
+        private bool connected;
         private readonly Thread inputRefresher;
-        private bool disposed = false;
+        private bool disposed;
         private DeviceInputChangedEventArgs deviceInputChangedEventArgs;
 
         /// <summary>
@@ -124,6 +122,7 @@ namespace XOutput.Devices.Input.DirectInput
         /// <param name="joystick">SharpDX joystick</param>
         public DirectDevice(DeviceInstance deviceInstance, Joystick joystick, String displayName)
         {
+            EffectInfo force;
             this.deviceInstance = deviceInstance;
             this.joystick = joystick;
             this.displayName = displayName;
@@ -151,7 +150,7 @@ namespace XOutput.Devices.Input.DirectInput
             }
             catch(Exception)
             {
-                logger.Warning($"Failed to set cooperative level to exclusive for {ToString()}");
+                Logger.Warning($"Failed to set cooperative level to exclusive for {ToString()}");
             }
             joystick.Acquire();
             if (deviceInstance.ForceFeedbackDriverGuid != Guid.Empty)
@@ -181,13 +180,13 @@ namespace XOutput.Devices.Input.DirectInput
             }
             try
             {
-                logger.Info(joystick.Properties.InstanceName + " " + ToString());
-                logger.Info(PrettyPrint.ToString(joystick));
-                logger.Info(PrettyPrint.ToString(joystick.GetObjects()));
+                Logger.Info(joystick.Properties.InstanceName + " " + ToString());
+                Logger.Info(PrettyPrint.ToString(joystick));
+                Logger.Info(PrettyPrint.ToString(joystick.GetObjects()));
             } catch { }
             foreach (var obj in joystick.GetObjects())
             {
-                logger.Info("  " + obj.Name + " " + obj.ObjectId + " offset: " + obj.Offset + " objecttype: " + obj.ObjectType.ToString() + " " + obj.Usage);
+                Logger.Info("  " + obj.Name + " " + obj.ObjectId + " offset: " + obj.Offset + " objecttype: " + obj.ObjectType.ToString() + " " + obj.Usage);
             }
             state = new DeviceState(sources, joystick.Capabilities.PovCount);
             deviceInputChangedEventArgs = new DeviceInputChangedEventArgs(this);
@@ -318,7 +317,7 @@ namespace XOutput.Devices.Input.DirectInput
                 }
                 catch (Exception)
                 {
-                    logger.Warning($"Poll failed for {ToString()}");
+                    Logger.Warning($"Poll failed for {ToString()}");
                     return false;
                 }
             }
@@ -449,7 +448,7 @@ namespace XOutput.Devices.Input.DirectInput
                 }
                 catch (SharpDXException ex)
                 {
-                    logger.Error(ex);
+                    Logger.Error(ex);
                 }
             }
             return axes;
