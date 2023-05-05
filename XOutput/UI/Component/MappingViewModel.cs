@@ -81,6 +81,6 @@ public class MappingViewModel : ViewModelBase<MappingModel>
             Model.ConfigVisibility = Visibility.Visible;
         }
 
-        Controllers.Instance.Update(controller, InputDevices.Instance.GetDevices());
+        Controllers.Instance.Update(controller);
     }
 }

@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
-using XOutput.Logging;
+
 using XOutput.Tools;
 
 namespace XOutput.UI.Windows;
@@ -13,7 +13,6 @@ namespace XOutput.UI.Windows;
 /// </summary>
 public partial class MainWindow : Window, IViewBase<MainWindowViewModel, MainWindowModel>
 {
-    private static readonly ILogger logger = LoggerFactory.GetLogger(typeof(MainWindow));
     private bool hardExit;
     private WindowState restoreState = WindowState.Normal;
 
@@ -25,12 +24,12 @@ public partial class MainWindow : Window, IViewBase<MainWindowViewModel, MainWin
         {
             Visibility = Visibility.Hidden;
             ShowInTaskbar = false;
-            logger.Info("Starting XOutput in minimized to taskbar");
+            Serilog.Log.Information("Starting XOutput in minimized to taskbar");
         }
         else
         {
             ShowInTaskbar = true;
-            logger.Info("Starting XOutput in normal window");
+            Serilog.Log.Information("Starting XOutput in normal window");
         }
 
         new WindowInteropHelper(this).EnsureHandle();
@@ -43,7 +42,7 @@ public partial class MainWindow : Window, IViewBase<MainWindowViewModel, MainWin
 
     private async Task Initialize()
     {
-        await logger.Info("The application has started.");
+        Serilog.Log.Information("The application has started.");
         await GetData();
     }
 
@@ -70,8 +69,8 @@ public partial class MainWindow : Window, IViewBase<MainWindowViewModel, MainWin
             }
             catch (Exception ex)
             {
-                logger.Error("Cannot log into the log box: " + msg + Environment.NewLine);
-                logger.Error(ex);
+                Serilog.Log.Error("Cannot log into the log box: " + msg + Environment.NewLine);
+                Serilog.Log.Error(ex, "Exception");
             }
         }));
     }
@@ -83,7 +82,7 @@ public partial class MainWindow : Window, IViewBase<MainWindowViewModel, MainWin
 
     private void RefreshClick(object sender, RoutedEventArgs e)
     {
-        ViewModel.RefreshGameControllers();
+        ViewModel.RefreshInputDevices();
     }
 
     private void ExitClick(object sender, RoutedEventArgs e)
@@ -95,7 +94,7 @@ public partial class MainWindow : Window, IViewBase<MainWindowViewModel, MainWin
         }
         else
         {
-            logger.Info("The application will exit.");
+            Serilog.Log.Information("The application will exit.");
             Application.Current.Shutdown();
         }
     }
@@ -133,19 +132,19 @@ public partial class MainWindow : Window, IViewBase<MainWindowViewModel, MainWin
             restoreState = WindowState;
             Visibility = Visibility.Hidden;
             ShowInTaskbar = false;
-            logger.Info("The application is closed to tray.");
+            Serilog.Log.Information("The application is closed to tray.");
         }
     }
 
     private async void WindowClosed(object sender, EventArgs e)
     {
         ViewModel.Dispose();
-        await logger.Info("The application will exit.");
+        Serilog.Log.Information("The application will exit.");
     }
 
     private void CheckBoxChecked(object sender, RoutedEventArgs e)
     {
-        ViewModel.RefreshGameControllers();
+        ViewModel.RefreshInputDevices();
     }
 
     private void TaskbarIconTrayMouseDoubleClick(object sender, RoutedEventArgs e)

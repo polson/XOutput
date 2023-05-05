@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.Win32;
-using XOutput.Logging;
+using Serilog;
+
 
 namespace XOutput.Tools;
 
@@ -21,8 +22,6 @@ public sealed class RegistryModifier
     /// </summary>
     public const string AutostartParams = " --minimized";
 
-    private static readonly ILogger logger = LoggerFactory.GetLogger(typeof(RegistryModifier));
-
     /// <summary>
     ///     Gets or sets the autostart.
     /// </summary>
@@ -33,7 +32,7 @@ public sealed class RegistryModifier
             using (var key = GetRegistryKey())
             {
                 var exists = key.GetValue(AutostartValueKey) != null;
-                logger.Debug($"{AutostartValueKey} registry is " + (exists ? "" : "not ") + "found");
+                Log.Debug($"{AutostartValueKey} registry is " + (exists ? "" : "not ") + "found");
                 return exists;
             }
         }
@@ -56,7 +55,7 @@ public sealed class RegistryModifier
             var filename = Process.GetCurrentProcess().MainModule.FileName;
             var value = $"\"{filename}\" {AutostartParams}";
             key.SetValue(AutostartValueKey, value);
-            logger.Debug($"{AutostartValueKey} registry set to {value}");
+            Log.Debug($"{AutostartValueKey} registry set to {value}");
         }
     }
 
@@ -68,7 +67,7 @@ public sealed class RegistryModifier
         using (var key = GetRegistryKey())
         {
             key.DeleteValue(AutostartValueKey);
-            logger.Debug($"{AutostartValueKey} registry is deleted");
+            Log.Debug($"{AutostartValueKey} registry is deleted");
         }
     }
 

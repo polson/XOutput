@@ -1,7 +1,8 @@
 ﻿using System;
+using Serilog;
 using SharpDX;
 using SharpDX.DirectInput;
-using XOutput.Logging;
+
 
 namespace XOutput.Devices.Input.DirectInput;
 
@@ -10,7 +11,6 @@ namespace XOutput.Devices.Input.DirectInput;
 /// </summary>
 public class DirectDeviceForceFeedback : IDisposable
 {
-    private static readonly ILogger logger = LoggerFactory.GetLogger(typeof(DirectDeviceForceFeedback));
     private readonly EffectInfo force;
     private readonly int gain;
     private readonly Joystick joystick;
@@ -116,7 +116,7 @@ public class DirectDeviceForceFeedback : IDisposable
         }
         catch (SharpDXException)
         {
-            logger.Warning($"Failed to create and start effect for {ToString()}");
+            Log.Warning($"Failed to create and start effect for {ToString()}");
             return null;
         }
     }

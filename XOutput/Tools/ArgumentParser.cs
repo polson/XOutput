@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using XOutput.Logging;
+using Serilog;
+
 
 namespace XOutput.Tools;
 
@@ -10,8 +11,6 @@ namespace XOutput.Tools;
 /// </summary>
 public class ArgumentParser
 {
-    private static readonly ILogger logger = LoggerFactory.GetLogger(typeof(ArgumentParser));
-
     public ArgumentParser() : this(Environment.GetCommandLineArgs().Skip(1).ToArray())
     {
     }
@@ -21,7 +20,7 @@ public class ArgumentParser
         var args = arguments.ToList();
         Minimized = args.Any(arg => arg == "--minimized");
         if (Minimized) args.Remove("--minimized");
-        foreach (var arg in args) logger.Warning($"Unused command line argument: {arg}");
+        foreach (var arg in args) Log.Warning($"Unused command line argument: {arg}");
     }
 
     /// <summary>

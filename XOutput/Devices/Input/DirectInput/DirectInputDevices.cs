@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Serilog;
 using SharpDX.DirectInput;
-using XOutput.Logging;
+
 
 namespace XOutput.Devices.Input.DirectInput;
 
@@ -15,8 +16,6 @@ public sealed class DirectInputDevices : IDisposable
     ///     Id of the emulated SCP device
     /// </summary>
     private const string EmulatedSCPID = "028e045e-0000-0000-0000-504944564944";
-
-    private static readonly ILogger logger = LoggerFactory.GetLogger(typeof(DirectDevice));
 
     private readonly SharpDX.DirectInput.DirectInput directInput = new();
 
@@ -65,12 +64,11 @@ public sealed class DirectInputDevices : IDisposable
 
             joystick.Properties.BufferSize = 128;
             var device = new DirectDevice(deviceInstance, joystick, deviceName);
-            InputDevices.Instance.Add(device);
             return device;
         }
         catch (Exception ex)
         {
-            logger.Error("Failed to create device " + deviceInstance.InstanceGuid + " " + deviceInstance.InstanceName +
+            Log.Error("Failed to create device " + deviceInstance.InstanceGuid + " " + deviceInstance.InstanceName +
                          ex);
             return null;
         }

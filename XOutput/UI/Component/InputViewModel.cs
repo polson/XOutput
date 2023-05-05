@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Serilog;
 using XOutput.Devices;
 using XOutput.Devices.Input;
 using XOutput.UI.Windows;
@@ -23,6 +24,7 @@ public class InputViewModel : ViewModelBase<InputModel>, IDisposable
 
     public void Dispose()
     {
+        Log.Information(">>DISPOSING MODEL");
         timer.Tick -= Timer_Tick;
         Model.Device.InputChanged -= InputDevice_InputChanged;
         Model.Device.Dispose();

@@ -4,7 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
-using XOutput.Logging;
+using Serilog;
+
 
 namespace XOutput.Tools;
 
@@ -13,7 +14,6 @@ namespace XOutput.Tools;
 /// </summary>
 public sealed class LanguageManager
 {
-    private static readonly ILogger logger = LoggerFactory.GetLogger(typeof(LanguageManager));
     private readonly Dictionary<string, Dictionary<string, string>> data = new();
 
     private string language;
@@ -32,7 +32,7 @@ public sealed class LanguageManager
                 data[resourceKey] = serializer.Deserialize<Dictionary<string, string>>(stream);
             }
 
-            logger.Info(resourceKey + " language is loaded.");
+            Log.Information(resourceKey + " language is loaded.");
         }
 
         Language = "English";
@@ -56,7 +56,7 @@ public sealed class LanguageManager
             if (language != v)
             {
                 language = v;
-                logger.Info("Language is set to " + language);
+                Log.Information("Language is set to " + language);
                 LanguageModel.Instance.Data = data[language];
             }
         }

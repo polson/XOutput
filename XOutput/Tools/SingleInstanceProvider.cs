@@ -3,7 +3,8 @@ using System.IO;
 using System.IO.Pipes;
 using System.Text;
 using System.Threading;
-using XOutput.Logging;
+using Serilog;
+
 
 namespace XOutput.Tools;
 
@@ -14,7 +15,6 @@ public class SingleInstanceProvider
     private const string ShowCommand = "Show";
     private const string OkResponse = "OK";
     private const string ErrorResponse = "ERROR";
-    private static readonly ILogger logger = LoggerFactory.GetLogger(typeof(SingleInstanceProvider));
     private readonly Mutex mutex = new(false, MutexName);
 
     private Thread notifyThread;
@@ -79,7 +79,7 @@ public class SingleInstanceProvider
                 }
                 catch (IOException e)
                 {
-                    logger.Error(e);
+                    Log.Error(e, "Exception");
                 }
             }
     }

@@ -2,8 +2,9 @@
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
+using Serilog;
+using Serilog.Events;
 using XOutput.Devices.Input.Mouse;
-using XOutput.Logging;
 using XOutput.Tools;
 using XOutput.UI;
 using XOutput.UI.Windows;
@@ -15,13 +16,13 @@ namespace XOutput;
 /// </summary>
 public partial class App : Application
 {
-    private static readonly ILogger logger = LoggerFactory.GetLogger(typeof(App));
     private readonly ArgumentParser argumentParser;
 
     private MainWindowViewModel mainWindowViewModel;
 
     public App()
     {
+        setupLogging();
         var dependencyEmbedder = new DependencyEmbedder();
         dependencyEmbedder.AddPackage("Newtonsoft.Json");
         dependencyEmbedder.AddPackage("SharpDX.DirectInput");
@@ -44,9 +45,24 @@ public partial class App : Application
 #endif
     }
 
+    private void setupLogging()
+    {
+        const string logFilePath = "xoutput.log";
+        if (File.Exists(logFilePath))
+        {
+            File.Delete(logFilePath);
+        }
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+            .Enrich.FromLogContext()
+            .WriteTo.File("xoutput.log")
+            .CreateLogger();
+    }
+
     public async Task UnhandledException(Exception exceptionObject)
     {
-        await logger.Error(exceptionObject);
+        Log.Error(exceptionObject, "Exception");
         MessageBox.Show(exceptionObject.Message + Environment.NewLine + exceptionObject.StackTrace);
     }
 
@@ -62,7 +78,7 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            logger.Error(ex);
+            Log.Error(ex, "Exception");
             MessageBox.Show(ex.ToString());
             Current.Shutdown();
         }

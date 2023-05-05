@@ -5,9 +5,9 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
+using Serilog;
 using SharpDX;
 using SharpDX.DirectInput;
-using XOutput.Logging;
 using XOutput.Tools;
 
 namespace XOutput.Devices.Input.DirectInput;
@@ -17,7 +17,6 @@ namespace XOutput.Devices.Input.DirectInput;
 /// </summary>
 public sealed class DirectDevice : IInputDevice
 {
-    private static readonly ILogger Logger = LoggerFactory.GetLogger(typeof(DirectDevice));
     private readonly List<DirectDeviceForceFeedback> actuators = new();
     private readonly DeviceInstance deviceInstance;
     private readonly Thread inputRefresher;
@@ -69,7 +68,7 @@ public sealed class DirectDevice : IInputDevice
         }
         catch (Exception)
         {
-            Logger.Warning($"Failed to set cooperative level to exclusive for {ToString()}");
+            Log.Warning($"Failed to set cooperative level to exclusive for {ToString()}");
         }
 
         joystick.Acquire();
@@ -96,16 +95,14 @@ public sealed class DirectDevice : IInputDevice
 
         try
         {
-            Logger.Info(joystick.Properties.InstanceName + " " + ToString());
-            Logger.Info(PrettyPrint.ToString(joystick));
-            Logger.Info(PrettyPrint.ToString(joystick.GetObjects()));
+            Log.Information(joystick.Properties.InstanceName + " " + ToString());
         }
         catch
         {
         }
 
         foreach (var obj in joystick.GetObjects())
-            Logger.Info("  " + obj.Name + " " + obj.ObjectId + " offset: " + obj.Offset + " objecttype: " +
+            Log.Information("  " + obj.Name + " " + obj.ObjectId + " offset: " + obj.Offset + " objecttype: " +
                         obj.ObjectType + " " + obj.Usage);
         state = new DeviceState(sources, joystick.Capabilities.PovCount);
         deviceInputChangedEventArgs = new DeviceInputChangedEventArgs(this);
@@ -127,9 +124,9 @@ public sealed class DirectDevice : IInputDevice
     {
         if (!disposed)
         {
+            Log.Information(">>DISPOSING DirectDevice");
             disposed = true;
             inputRefresher?.Interrupt();
-            foreach (var actuator in actuators) actuator.Dispose();
             joystick.Dispose();
         }
     }
@@ -190,7 +187,7 @@ public sealed class DirectDevice : IInputDevice
             }
             catch (Exception)
             {
-                Logger.Warning($"Poll failed for {ToString()}");
+                Log.Warning($"Poll failed for {ToString()}");
                 return false;
             }
 
@@ -218,7 +215,7 @@ public sealed class DirectDevice : IInputDevice
         {
             while (Connected)
             {
-                Connected = RefreshInput();
+                // Connected = RefreshInput();
                 Thread.Sleep(ReadDelayMs);
             }
         }
@@ -347,7 +344,7 @@ public sealed class DirectDevice : IInputDevice
             }
             catch (SharpDXException ex)
             {
-                Logger.Error(ex);
+                Log.Error(ex, "Exception");
             }
         }
 

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
+using Serilog;
 using SharpDX.DirectInput;
 using XOutput.Devices;
 using XOutput.Devices.Input;
@@ -13,7 +14,7 @@ using XOutput.Devices.Mapper;
 using XOutput.Devices.XInput;
 using XOutput.Devices.XInput.Vigem;
 using XOutput.Diagnostics;
-using XOutput.Logging;
+
 using XOutput.Tools;
 using XOutput.UI.Component;
 using XOutput.UpdateChecker;
@@ -28,7 +29,6 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
     private const string SettingsFilePath = "settings.json";
     private const string GameControllersSettings = "joy.cpl";
 
-    private static readonly ILogger Logger = LoggerFactory.GetLogger(typeof(MainWindowViewModel));
     private readonly DirectInputDevices directInputDevices = new();
     private readonly Dispatcher dispatcher;
 
@@ -69,17 +69,17 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
         var languageManager = LanguageManager.Instance;
         SetupSettings(languageManager);
         CheckVigemAvailable();
-        RefreshGameControllers();
+        RefreshInputDevices();
         SetupTimer();
-        AddKeyboardController();
-        AddMouseController();
-        AddControllersFromSettings();
+        // AddKeyboardController();
+        // AddMouseController();
+        AddOutputControllers();
     }
 
     private void CheckVigemAvailable()
     {
         if (HasVigem) return;
-        Logger.Error("ViGEm is not installed.");
+        Log.Error("ViGEm is not installed.");
         var error = Translate("VigemAndScpNotInstalled");
         log(error);
         MessageBox.Show(error, Translate("Error"));
@@ -90,42 +90,39 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
         timer.Interval = TimeSpan.FromMilliseconds(5000);
         timer.Tick += (sender1, e1) =>
         {
-            if (!settings.DisableAutoRefresh) RefreshGameControllers();
+            if (!settings.DisableAutoRefresh) RefreshInputDevices();
         };
         timer.Start();
     }
 
     private void AddKeyboardController()
     {
-        Logger.Debug("Creating keyboard controller");
+        Log.Debug("Creating keyboard controller");
         var keyboard = new Keyboard();
         settings.GetOrCreateInputConfiguration(keyboard.ToString(), keyboard.InputConfiguration);
-        InputDevices.Instance.Add(keyboard);
         Model.Inputs.Add(new InputView(new InputViewModel(new InputModel(), keyboard)));
 
         log(string.Format(LanguageModel.Instance.Translate("ControllerConnected"),
             LanguageModel.Instance.Translate("Keyboard")));
-        Logger.Info("Keyboard controller is connected");
+        Log.Information("Keyboard controller is connected");
     }
 
     private void AddMouseController()
     {
-        Logger.Debug("Creating mouse controller");
+        Log.Debug("Creating mouse controller");
         var mouse = new Mouse();
         settings.GetOrCreateInputConfiguration(mouse.ToString(), mouse.InputConfiguration);
-        InputDevices.Instance.Add(mouse);
         Model.Inputs.Add(new InputView(new InputViewModel(new InputModel(), mouse)));
-
         log(string.Format(LanguageModel.Instance.Translate("ControllerConnected"),
             LanguageModel.Instance.Translate("Mouse")));
-        Logger.Info("Mouse controller is connected");
+        Log.Information("Mouse controller is connected");
     }
 
-    private void AddControllersFromSettings()
+    private void AddOutputControllers()
     {
         foreach (var mapping in settings.Mapping)
         {
-            AddController(mapping);
+            // AddController(mapping);
         }
     }
 
@@ -136,14 +133,14 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
         {
             settings = Settings.Load(SettingsFilePath);
             languageManager.Language = settings.Language;
-            Logger.Info("Loading settings was successful.");
+            Log.Information("Loading settings was successful.");
             log(string.Format(Translate("LoadSettingsSuccess"), SettingsFilePath));
             Model.Settings = settings;
         }
         catch (Exception ex)
         {
             settings = new Settings();
-            Logger.Warning("Loading settings was unsuccessful.");
+            Log.Warning("Loading settings was unsuccessful.");
             var error = string.Format(Translate("LoadSettingsError"), SettingsFilePath) + Environment.NewLine +
                         ex.Message;
             log(error);
@@ -156,13 +153,13 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
         try
         {
             settings.Save(SettingsFilePath);
-            Logger.Info("Saving settings was successful.");
+            Log.Information("Saving settings was successful.");
             log(string.Format(Translate("SaveSettingsSuccess"), SettingsFilePath));
         }
         catch (Exception ex)
         {
-            Logger.Warning("Saving settings was unsuccessful.");
-            Logger.Warning(ex);
+            Log.Warning("Saving settings was unsuccessful.");
+            Log.Warning(ex, "Exception");
             var error = string.Format(Translate("SaveSettingsError"), SettingsFilePath) + Environment.NewLine +
                         ex.Message;
             log(error);
@@ -182,18 +179,18 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
         switch (compare)
         {
             case UpdateChecker.VersionCompare.Error:
-                Logger.Warning("Failed to check latest version");
+                Log.Warning("Failed to check latest version");
                 log(Translate("VersionCheckError"));
                 break;
             case UpdateChecker.VersionCompare.NeedsUpgrade:
-                Logger.Info("New version is available");
+                Log.Information("New version is available");
                 log(Translate("VersionCheckNeedsUpgrade"));
                 break;
             case UpdateChecker.VersionCompare.NewRelease:
                 log(Translate("VersionCheckNewRelease"));
                 break;
             case UpdateChecker.VersionCompare.UpToDate:
-                Logger.Info("Version is up-to-date");
+                Log.Information("Version is up-to-date");
                 log(Translate("VersionCheckUpToDate"));
                 break;
             default:
@@ -201,31 +198,37 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
         }
     }
 
-    public void RefreshGameControllers()
+    public void RefreshInputDevices()
     {
         var dinputDevices = directInputDevices.GetInputDevices(Model.AllDevices).ToList();
         var devicesChanged = false;
-
         var didRemove = RemoveDisconnectedDevices(dinputDevices);
         var didAdd = AddNewDevices(dinputDevices);
-
+        
         if (devicesChanged) UpdateControllersMappingsAndInstances();
     }
 
     private bool RemoveDisconnectedDevices(List<DeviceInstance> dinputDevices)
     {
         var didRemoveDevices = false;
-        foreach (var inputView in Model.Inputs.ToArray())
+        var itemsToRemove = new List<InputView>();
+        foreach (var inputView in Model.Inputs)
         {
             var modelDevice = inputView.ViewModel.Model.Device;
-            if (modelDevice is not DirectDevice dModelDevice) continue;
-            if (dinputDevices.Any(x => x.InstanceGuid == dModelDevice.Id)) continue;
-
-            Model.Inputs.Remove(inputView);
-            InputDevices.Instance.Remove(modelDevice);
-            inputView.ViewModel.Dispose();
+            if (modelDevice is not DirectDevice dModelDevice) 
+                continue;
+            if (dinputDevices.Any(x => x.InstanceGuid == dModelDevice.Id))
+                continue;
+            itemsToRemove.Add(inputView);
             DisplayNames.Remove(modelDevice.DisplayName);
             didRemoveDevices = true;
+        }
+
+        // Remove the items from the collection.
+        foreach (var item in itemsToRemove)
+        {
+            Model.Inputs.Remove(item);
+            item.ViewModel.Dispose();
         }
 
         return didRemoveDevices;
@@ -244,7 +247,8 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
             var device = directInputDevices.CreateDirectDevice(dinputDevice, displayName);
             if (device == null) continue;
 
-            var inputConfig = settings.GetOrCreateInputConfiguration(device.ToString(), device.InputConfiguration);
+            //LEAK:
+            // var inputConfig = settings.GetOrCreateInputConfiguration(device.ToString(), device.InputConfiguration);
             device.Disconnected -= DispatchRefreshGameControllers;
             device.Disconnected += DispatchRefreshGameControllers;
             Model.Inputs.Add(new InputView(new InputViewModel(new InputModel(), device)));
@@ -269,7 +273,7 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
             controller.Mapper.Mappings = mapper.Mappings;
         }
 
-        Controllers.Instance.Update(InputDevices.Instance.GetDevices());
+        Controllers.Instance.Update();
     }
 
     private string CalculateDisplayName(DeviceInstance dinputDevice)
@@ -292,13 +296,13 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
         Controllers.Instance.Add(gameController);
 
         var controllerView = new ControllerView(new ControllerViewModel(gameController, log));
-        controllerView.ViewModel.Model.CanStart = CanStart;
+        controllerView.ViewModel.Model.CanStart = HasVigem;
         controllerView.RemoveClicked += RemoveController;
         Model.Controllers.Add(controllerView);
         log(string.Format(LanguageModel.Instance.Translate("ControllerConnected"), gameController.DisplayName));
         if (mapper?.StartWhenConnected != true) return;
         controllerView.ViewModel.Start();
-        Logger.Info($"{mapper.Name} controller is started automatically.");
+        Log.Information($"{mapper.Name} controller is started automatically.");
     }
 
     public void RemoveController(ControllerView controllerView)
@@ -307,7 +311,7 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
         controllerView.ViewModel.Dispose();
         controller.Dispose();
         Model.Controllers.Remove(controllerView);
-        Logger.Info($"{controller} is disconnected.");
+        Log.Information($"{controller} is disconnected.");
         log(string.Format(LanguageModel.Instance.Translate("ControllerDisconnected"), controller.DisplayName));
         Controllers.Instance.Remove(controller);
         settings.Mapping.RemoveAll(m => m.Id == controller.Mapper.Id);
@@ -315,7 +319,7 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
 
     public void OpenWindowsGameControllerSettings()
     {
-        Logger.Debug("Starting " + GameControllersSettings);
+        Log.Debug("Starting " + GameControllersSettings);
         new Process
         {
             StartInfo = new ProcessStartInfo
@@ -326,7 +330,7 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
                 UseShellExecute = false
             }
         }.Start();
-        Logger.Debug("Started " + GameControllersSettings);
+        Log.Debug("Started " + GameControllersSettings);
     }
 
     public void OpenSettings()
@@ -357,7 +361,7 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
         var delayThread = new Thread(() =>
         {
             Thread.Sleep(1000);
-            dispatcher.Invoke(RefreshGameControllers);
+            dispatcher.Invoke(RefreshInputDevices);
         })
         {
             Name = "Device list refresh delay",

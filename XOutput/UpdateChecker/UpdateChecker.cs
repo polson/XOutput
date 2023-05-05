@@ -2,7 +2,8 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using XOutput.Logging;
+using Serilog;
+
 
 namespace XOutput.UpdateChecker;
 
@@ -13,7 +14,6 @@ public sealed class UpdateChecker : IDisposable
     /// </summary>
     private const string GithubURL = "https://raw.githubusercontent.com/csutorasa/XOutput/master/latest.version";
 
-    private static readonly ILogger logger = LoggerFactory.GetLogger(typeof(UpdateChecker));
     private readonly HttpClient client = new();
 
     public UpdateChecker()
@@ -50,7 +50,7 @@ public sealed class UpdateChecker : IDisposable
         HttpResponseMessage response = null;
         try
         {
-            await logger.Debug("Getting " + GithubURL);
+            Log.Debug("Getting " + GithubURL);
             response = await client.GetAsync(new Uri(GithubURL));
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();

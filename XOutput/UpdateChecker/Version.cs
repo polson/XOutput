@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
-using XOutput.Logging;
+using Serilog;
+
 
 namespace XOutput.UpdateChecker;
 
@@ -14,8 +15,6 @@ public static class Version
     /// </summary>
     public const string AppVersion = "3.31";
 
-    private static readonly ILogger logger = LoggerFactory.GetLogger(typeof(Version));
-
     /// <summary>
     ///     Compares the version with the current version.
     /// </summary>
@@ -25,8 +24,8 @@ public static class Version
     {
         try
         {
-            logger.Debug("Current application version: " + appVersion);
-            logger.Debug("Latest application version: " + version);
+            Log.Debug("Current application version: " + appVersion);
+            Log.Debug("Latest application version: " + version);
             var current = appVersion.Split('.').Select(t => int.Parse(t)).ToArray();
             var compare = version.Split('.').Select(t => int.Parse(t)).ToArray();
             for (var i = 0; i < 100; i++)

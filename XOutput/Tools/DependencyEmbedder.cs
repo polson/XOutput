@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using XOutput.Logging;
+using Serilog;
+
 
 namespace XOutput.Tools;
 
 public class DependencyEmbedder
 {
-    private static readonly ILogger logger = LoggerFactory.GetLogger(typeof(DependencyEmbedder));
-
     private readonly List<KeyValuePair<string, string>> packages = new();
 
     /// <summary>
@@ -36,7 +35,7 @@ public class DependencyEmbedder
         foreach (var package in packages)
             if (args.Name.StartsWith(package.Key))
             {
-                logger.Info("Loading " + package.Value + ".dll from embedded resources");
+                Log.Information("Loading " + package.Value + ".dll from embedded resources");
                 return LoadAssemblyFromResource(Assembly.GetExecutingAssembly().GetName().Name + "." + package.Value +
                                                 ".dll");
             }

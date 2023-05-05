@@ -3,12 +3,12 @@ using System.Linq;
 using System.Threading;
 using Nefarius.ViGEm.Client.Targets;
 using Nefarius.ViGEm.Client.Targets.Xbox360;
+using Serilog;
 using XOutput.Devices.Input;
 using XOutput.Devices.Input.DirectInput;
 using XOutput.Devices.Mapper;
 using XOutput.Devices.XInput;
 using XOutput.Devices.XInput.Vigem;
-using XOutput.Logging;
 
 namespace XOutput.Devices;
 
@@ -17,8 +17,6 @@ namespace XOutput.Devices;
 /// </summary>
 public sealed class GameController : IDisposable
 {
-    private static readonly ILogger logger = LoggerFactory.GetLogger(typeof(GameController));
-
     private IXbox360Controller controller;
     private int controllerCount = -1;
     private bool running;
@@ -103,10 +101,10 @@ public sealed class GameController : IDisposable
         thread.Name = $"Emulated controller {controllerCount} output refresher";
         thread.IsBackground = true;
         thread.Start();
-        logger.Info($"Emulation started on {ToString()}.");
+        Log.Information($"Emulation started on {ToString()}.");
         if (ForceFeedbackSupported)
         {
-            logger.Info($"Force feedback mapping is connected on {ToString()}.");
+            Log.Information($"Force feedback mapping is connected on {ToString()}.");
             controller = ((VigemDevice)XOutputInterface).GetController(controllerCount);
             controller.FeedbackReceived += ControllerFeedbackReceived;
         }
@@ -126,10 +124,10 @@ public sealed class GameController : IDisposable
             if (ForceFeedbackSupported)
             {
                 controller.FeedbackReceived -= ControllerFeedbackReceived;
-                logger.Info($"Force feedback mapping is disconnected on {ToString()}.");
+                Log.Information($"Force feedback mapping is disconnected on {ToString()}.");
             }
 
-            logger.Info($"Emulation stopped on {ToString()}.");
+            Log.Information($"Emulation stopped on {ToString()}.");
             resetId();
             thread?.Interrupt();
         }

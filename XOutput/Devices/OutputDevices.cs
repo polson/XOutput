@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Serilog;
 using XOutput.Devices.XInput;
 using XOutput.Devices.XInput.Vigem;
-using XOutput.Logging;
+
 
 namespace XOutput.Devices;
 
 public class OutputDevices
 {
     public const int MaxOutputDevices = 4;
-    private static readonly ILogger logger = LoggerFactory.GetLogger(typeof(OutputDevices));
 
     private readonly List<IXOutputInterface> outputDevices = new();
 
@@ -35,11 +35,11 @@ public class OutputDevices
     {
         if (VigemDevice.IsAvailable())
         {
-            logger.Info("ViGEm devices are used.");
+            Log.Information("ViGEm devices are used.");
             return new VigemDevice();
         }
 
-        logger.Error("Neither ViGEm nor SCP devices can be used.");
+        Log.Error("Neither ViGEm nor SCP devices can be used.");
         return null;
     }
 
