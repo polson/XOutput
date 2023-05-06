@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using Serilog;
 
 namespace XOutput.Devices.Input;
 
@@ -21,10 +23,14 @@ public class InputDevices
         Controllers.Instance.Update(inputDevices);
     }
 
-    public void Remove(IInputDevice inputDevice)
+    public IInputDevice GetDeviceByName(string deviceName)
     {
-        inputDevices.Remove(inputDevice);
-        Controllers.Instance.Update(inputDevices);
+        return inputDevices.FirstOrDefault(device => device.DisplayName == deviceName);
+    }
+    
+    public IInputDevice GetDeviceByGuid(string guid)
+    {
+        return inputDevices.FirstOrDefault(device => device.UniqueId == guid);
     }
 
     public IEnumerable<IInputDevice> GetDevices()

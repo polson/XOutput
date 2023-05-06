@@ -24,10 +24,9 @@ public class InputViewModel : ViewModelBase<InputModel>, IDisposable
 
     public void Dispose()
     {
-        Log.Information(">>DISPOSING MODEL");
         timer.Tick -= Timer_Tick;
         Model.Device.InputChanged -= InputDevice_InputChanged;
-        Model.Device.Dispose();
+        Model.Device = null;
     }
 
     public void Edit()

@@ -44,9 +44,7 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
     {
         this.dispatcher = dispatcher;
     }
-
-    private List<string> DisplayNames { get; } = new();
-
+    
     public void Dispose()
     {
         foreach (var device in Model.Inputs.Select(x => x.ViewModel.Model.Device)) device.Dispose();
@@ -99,6 +97,7 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
     {
         Log.Debug("Creating keyboard controller");
         var keyboard = new Keyboard();
+        InputDevices.Instance.Add(keyboard);
         settings.GetOrCreateInputConfiguration(keyboard.ToString(), keyboard.InputConfiguration);
         Model.Inputs.Add(new InputView(new InputViewModel(new InputModel(), keyboard)));
 
@@ -201,9 +200,10 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
     public void RefreshInputDevices()
     {
         var dinputDevices = directInputDevices.GetInputDevices(Model.AllDevices).ToList();
-        var devicesChanged = false;
         var didRemove = RemoveDisconnectedDevices(dinputDevices);
         var didAdd = AddNewDevices(dinputDevices);
+        
+        var devicesChanged = didRemove || didAdd;
         
         if (devicesChanged) UpdateControllersMappingsAndInstances();
     }
@@ -220,8 +220,6 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
             if (dinputDevices.Any(x => x.InstanceGuid == dModelDevice.Id))
                 continue;
             itemsToRemove.Add(inputView);
-            DisplayNames.Remove(modelDevice.DisplayName);
-            didRemoveDevices = true;
         }
 
         // Remove the items from the collection.
@@ -229,6 +227,7 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
         {
             Model.Inputs.Remove(item);
             item.ViewModel.Dispose();
+            didRemoveDevices = true;
         }
 
         return didRemoveDevices;
@@ -239,18 +238,21 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
         var didAddDevices = false;
         foreach (var dinputDevice in dinputDevices)
         {
-            if (DeviceAlreadyExists(dinputDevice)) continue;
+            if (InputViewAlreadyExists(dinputDevice)) continue;
 
-            var displayName = CalculateDisplayName(dinputDevice);
-            DisplayNames.Add(displayName);
+            var device = InputDevices.Instance.GetDeviceByGuid(dinputDevice.InstanceGuid.ToString());
+            if (device == null)
+            {
+                var displayName = CalculateDisplayName(dinputDevice);
+                device = directInputDevices.CreateDirectDevice(dinputDevice, displayName);
+                if (device == null) continue;
 
-            var device = directInputDevices.CreateDirectDevice(dinputDevice, displayName);
-            if (device == null) continue;
+                // var inputConfig = settings.GetOrCreateInputConfiguration(device.ToString(), device.InputConfiguration);
+                device.Disconnected -= DispatchRefreshGameControllers;
+                device.Disconnected += DispatchRefreshGameControllers;
+                InputDevices.Instance.Add(device);
+            }
 
-            //LEAK:
-            // var inputConfig = settings.GetOrCreateInputConfiguration(device.ToString(), device.InputConfiguration);
-            device.Disconnected -= DispatchRefreshGameControllers;
-            device.Disconnected += DispatchRefreshGameControllers;
             Model.Inputs.Add(new InputView(new InputViewModel(new InputModel(), device)));
             didAddDevices = true;
         }
@@ -258,7 +260,7 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
         return didAddDevices;
     }
 
-    private bool DeviceAlreadyExists(DeviceInstance dinputDevice)
+    private bool InputViewAlreadyExists(DeviceInstance dinputDevice)
     {
         return Model.Inputs.Select(c => c.ViewModel.Model.Device)
             .OfType<DirectDevice>()
@@ -273,19 +275,20 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
             controller.Mapper.Mappings = mapper.Mappings;
         }
 
-        Controllers.Instance.Update();
+        //TODO:
+        // Controllers.Instance.Update();
     }
 
     private string CalculateDisplayName(DeviceInstance dinputDevice)
     {
+        var displayNames = InputDevices.Instance.GetDevices().Select(device => device.DisplayName).ToList();
         var count = 1;
         string baseName;
         do
         {
             baseName = $"{dinputDevice.ProductName} {count}";
             count++;
-        } while (DisplayNames.Contains(baseName));
-
+        } while (displayNames.Contains(baseName));
         return baseName;
     }
 

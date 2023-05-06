@@ -52,6 +52,7 @@ public sealed class DirectInputDevices : IDisposable
     /// <returns>Wrapped instance</returns>
     public DirectDevice CreateDirectDevice(DeviceInstance deviceInstance, string deviceName)
     {
+        Log.Information("Creating device " + deviceInstance.InstanceGuid + " " + deviceInstance.InstanceName + "");
         try
         {
             var joystick = new Joystick(directInput, deviceInstance.InstanceGuid);
