@@ -44,7 +44,7 @@ public class InputDiagnostics : IDiagnostics
 
     public DiagnosticsResult GetAxesResult()
     {
-        var axesCount = device.Sources.Count(s => InputSourceTypes.Axis.HasFlag(s.Type));
+        var axesCount = device.InputSources.Count(s => InputSourceTypes.Axis.HasFlag(s.Type));
         var result = new DiagnosticsResult
         {
             Value = axesCount,
@@ -59,7 +59,7 @@ public class InputDiagnostics : IDiagnostics
 
     public DiagnosticsResult GetSlidersResult()
     {
-        var slidersCount = device.Sources.Count(s => s.Type == InputSourceTypes.Slider);
+        var slidersCount = device.InputSources.Count(s => s.Type == InputSourceTypes.Slider);
         return new DiagnosticsResult
         {
             Value = slidersCount,
@@ -70,7 +70,7 @@ public class InputDiagnostics : IDiagnostics
 
     public DiagnosticsResult GetButtonsResult()
     {
-        var buttonsCount = device.Sources.Count(s => s.Type == InputSourceTypes.Button);
+        var buttonsCount = device.InputSources.Count(s => s.Type == InputSourceTypes.Button);
         var result = new DiagnosticsResult
         {
             Value = buttonsCount,

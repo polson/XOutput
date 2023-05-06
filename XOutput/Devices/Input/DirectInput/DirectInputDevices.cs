@@ -52,12 +52,16 @@ public sealed class DirectInputDevices : IDisposable
     /// <returns>Wrapped instance</returns>
     public DirectDevice CreateDirectDevice(DeviceInstance deviceInstance, string deviceName)
     {
-        Log.Information("Creating device " + deviceInstance.InstanceGuid + " " + deviceInstance.InstanceName + "");
+        if (deviceInstance.ProductGuid.ToString() == EmulatedSCPID)
+        {
+            return null;
+        }
+
         try
         {
             var joystick = new Joystick(directInput, deviceInstance.InstanceGuid);
-            if (joystick.Information.ProductGuid.ToString() == EmulatedSCPID ||
-                (joystick.Capabilities.AxeCount < 1 && joystick.Capabilities.ButtonCount < 1))
+            var capabilities = joystick.Capabilities;
+            if (capabilities.AxeCount < 1 && capabilities.ButtonCount < 1)
             {
                 joystick.Dispose();
                 return null;
@@ -65,12 +69,13 @@ public sealed class DirectInputDevices : IDisposable
 
             joystick.Properties.BufferSize = 128;
             var device = new DirectDevice(deviceInstance, joystick, deviceName);
+            Log.Information("Created device " + deviceInstance.ProductGuid + " " + deviceInstance.InstanceName + "");
             return device;
         }
         catch (Exception ex)
         {
             Log.Error("Failed to create device " + deviceInstance.InstanceGuid + " " + deviceInstance.InstanceName +
-                         ex);
+                      ex);
             return null;
         }
     }

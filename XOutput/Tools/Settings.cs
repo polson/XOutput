@@ -29,7 +29,7 @@ public sealed class Settings
         set => LanguageManager.Instance.Language = value;
     }
 
-    public Dictionary<string, InputConfig> Input { get; set; }
+    private Dictionary<string, InputConfig> Input { get; set; }
     public List<InputMapper> Mapping { get; set; }
 
     /// <summary>
@@ -103,8 +103,10 @@ public sealed class Settings
     {
         if (initialValue == null)
         {
-            Input[id] = new InputConfig();
-            Input[id].ForceFeedback = false;
+            Input[id] = new InputConfig
+            {
+                ForceFeedback = false
+            };
             return Input[id];
         }
 

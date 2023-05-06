@@ -16,7 +16,6 @@ public delegate void DeviceInputChangedHandler(object sender, DeviceInputChanged
 /// </summary>
 public class DeviceInputChangedEventArgs : EventArgs
 {
-    protected IEnumerable<int> changedDPads;
     protected IEnumerable<InputSource> changedValues;
 
     protected IDevice device;
@@ -25,7 +24,6 @@ public class DeviceInputChangedEventArgs : EventArgs
     {
         this.device = device;
         changedValues = new InputSource[0];
-        changedDPads = new int[0];
     }
 
     /// <summary>
@@ -38,24 +36,8 @@ public class DeviceInputChangedEventArgs : EventArgs
     /// </summary>
     public IEnumerable<InputSource> ChangedValues => changedValues;
 
-    /// <summary>
-    ///     Gets the changed DPad values.
-    /// </summary>
-    public IEnumerable<int> ChangedDPads => changedDPads;
-
     public void Refresh(IEnumerable<InputSource> changedValues)
     {
-        this.changedValues = changedValues;
-    }
-
-    public void Refresh(IEnumerable<int> changedDPads)
-    {
-        this.changedDPads = changedDPads;
-    }
-
-    public void Refresh(IEnumerable<InputSource> changedValues, IEnumerable<int> changedDPads)
-    {
-        this.changedDPads = changedDPads;
         this.changedValues = changedValues;
     }
 
@@ -67,15 +49,5 @@ public class DeviceInputChangedEventArgs : EventArgs
     public bool HasValueChanged(InputSource type)
     {
         return changedValues.Contains(type);
-    }
-
-    /// <summary>
-    ///     Gets if the value of the DPad has changed.
-    /// </summary>
-    /// <param name="type">input type</param>
-    /// <returns></returns>
-    public bool HasDPadChanged(int dPadIndex)
-    {
-        return changedDPads.Contains(dPadIndex);
     }
 }

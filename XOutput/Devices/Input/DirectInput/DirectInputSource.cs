@@ -19,6 +19,6 @@ public class DirectInputSource : InputSource
     internal bool Refresh(JoystickState state)
     {
         var newValue = valueGetter(state);
-        return RefreshValue(newValue);
+        return UpdateValue(newValue);
     }
 }

@@ -45,7 +45,7 @@ public class AutoConfigureViewModel : ViewModelBase<AutoConfigureModel>
             Model.TimerVisibility = Visibility.Collapsed;
         }
 
-        inputTypes = inputDevices.SelectMany(i => i.Sources).ToArray();
+        inputTypes = inputDevices.SelectMany(i => i.InputSources).ToArray();
         timer.Interval = TimeSpan.FromMilliseconds(BlinkTime);
         timer.Tick += TimerTick;
         timer.Start();

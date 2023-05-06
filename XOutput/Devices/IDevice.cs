@@ -16,7 +16,7 @@ public interface IDevice : IDisposable
     /// <summary>
     ///     Gets all Enum values that represent button.
     /// </summary>
-    IEnumerable<InputSource> Sources { get; }
+    IEnumerable<InputSource> InputSources { get; }
 
     /// <summary>
     ///     This event is invoked if the data from the device was updated.
@@ -34,5 +34,5 @@ public interface IDevice : IDisposable
     ///     Refreshes the current state. Triggers <see cref="InputChanged" /> event.
     /// </summary>
     /// <returns>if the input was available</returns>
-    bool RefreshInput(bool force = false);
+    void RefreshInput();
 }

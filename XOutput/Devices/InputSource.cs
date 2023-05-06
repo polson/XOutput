@@ -72,7 +72,7 @@ public abstract class InputSource
         InputChanged?.Invoke(this, null);
     }
 
-    protected bool RefreshValue(double newValue)
+    protected bool UpdateValue(double newValue)
     {
         if (newValue != value)
         {

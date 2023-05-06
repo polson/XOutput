@@ -19,25 +19,19 @@ public sealed class DirectDevice : IInputDevice
     private const int MaxButtons = 128;
     private const int MaxAxes = 24;
     private const int DPadOffsetBase = 1000;
-
-    #region Constants
-
-    /// <summary>
-    ///     The delay in milliseconds to sleep between input reads.
-    /// </summary>
-    private const int ReadDelayMs = 1;
-
-    #endregion
+    private const int InputReadDelayMs = 1;
 
     private readonly List<DirectDeviceForceFeedback> actuators = new();
     private readonly DeviceInputChangedEventArgs deviceInputChangedEventArgs;
     private readonly DeviceInstance deviceInstance;
     private readonly Thread inputRefresher;
     private readonly Joystick joystick;
-    private readonly DirectInputSource[] sources;
-    private readonly DeviceState state;
+    private readonly DirectInputSource[] inputSources;
     private bool connected;
     private bool disposed;
+    private readonly int dpadCount;
+    private readonly List<InputSource> dpadSources = new();
+    private JoystickState joystickState;
 
     /// <summary>
     ///     Creates a new DirectDevice instance.
@@ -50,46 +44,25 @@ public sealed class DirectDevice : IInputDevice
         this.deviceInstance = deviceInstance;
         this.joystick = joystick;
         DisplayName = displayName;
+        InitializeJoystick();
+        InitializeForceFeedback();
+        LogDeviceInformation();
+        inputSources = GetInputSources();
+        dpadCount = joystick.Capabilities.PovCount;
+        deviceInputChangedEventArgs = new DeviceInputChangedEventArgs(this);
+        InputConfiguration = new InputConfig(ForceFeedbackCount);
+        Connected = true;
+        inputRefresher = StartInputRefresherThread();
+    }
 
+    private DirectInputSource[] GetInputSources()
+    {
         var buttons = GetButtonSources();
         var axes = GetAxisSources();
         var sliders = GetSliderSources();
         var dpads = GetDpadSources();
-        
-        sources = buttons.Concat(axes).Concat(sliders).Concat(dpads).ToArray();
-
-        InitializeJoystick();
-        InitializeForceFeedback();
-        LogDeviceInformation();
-        state = new DeviceState(sources, joystick.Capabilities.PovCount);
-        deviceInputChangedEventArgs = new DeviceInputChangedEventArgs(this);
-        InputConfiguration = new InputConfig(ForceFeedbackCount);
-        inputRefresher = CreateInputRefresherThread();
-        Connected = true;
-        inputRefresher.Start();
-    }
-
-    /// <summary>
-    ///     Disposes all resources.
-    /// </summary>
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    private void Dispose(bool disposing)
-    {
-        if (!disposed)
-        {
-            if (disposing)
-            {
-                inputRefresher?.Interrupt();
-                inputRefresher?.Join();
-                joystick.Dispose();
-            }
-            disposed = true;
-        }
+        dpadSources.AddRange(dpads);
+        return buttons.Concat(axes).Concat(sliders).Concat(dpads).ToArray();
     }
 
     /// <summary>
@@ -125,47 +98,70 @@ public sealed class DirectDevice : IInputDevice
     ///     Refreshes the current state. Triggers <see cref="InputChanged" /> event.
     /// </summary>
     /// <returns>if the input was available</returns>
-    public bool RefreshInput(bool force = false)
+    public void RefreshInput()
     {
-        state.ResetChanges();
-        if (!disposed)
-            try
-            {
-                joystick.Poll();
-                for (var i = 0; i < state.DPads.Count(); i++) state.SetDPad(i, GetDPadValue(i));
-                foreach (var source in sources)
-                    if (source.Refresh(GetCurrentState()))
-                        state.MarkChanged(source);
-                var changes = state.GetChanges(force);
-                var dpadChanges = state.GetChangedDpads(force);
-                if (changes.Any() || dpadChanges.Any())
-                {
-                    deviceInputChangedEventArgs.Refresh(changes, dpadChanges);
-                    InputChanged?.Invoke(this, deviceInputChangedEventArgs);
-                }
+        try
+        {
+            // joystick.Poll();
+            // var datas = joystick.GetBufferedData();
+            // foreach (var state in datas)
+            // {
+            //     Log.Information("State: {0}", state);
+            // }
+            joystickState = joystick.GetCurrentState();
+            var changedSources = inputSources
+                .Where(source => source.Refresh(joystickState))
+                .Cast<InputSource>()
+                .ToList();
+            
+            if (!changedSources.Any()) return;
+            deviceInputChangedEventArgs.Refresh(changedSources);
+            InputChanged?.Invoke(this, deviceInputChangedEventArgs);
+        }
+        catch (Exception)
+        {
+            Connected = false;
+            Log.Warning($"Poll failed for {ToString()}");
+        }
+    }
 
-                return true;
-            }
-            catch (Exception)
-            {
-                Log.Warning($"Poll failed for {ToString()}");
-                return false;
-            }
-
-        return false;
+    /// <summary>
+    ///     Gets the current value of a DPad.
+    /// </summary>
+    /// <param name="dpadIndex">DPad index</param>
+    /// <param name="state">Joystick state</param>
+    /// <returns>Value</returns>
+    private DPadDirection GetDPadValue(int dpadIndex, JoystickState state)
+    {
+        return state.PointOfViewControllers[dpadIndex] switch
+        {
+            -1 => DPadDirection.None,
+            0 => DPadDirection.Up,
+            4500 => DPadDirection.Up | DPadDirection.Right,
+            9000 => DPadDirection.Right,
+            13500 => DPadDirection.Down | DPadDirection.Right,
+            18000 => DPadDirection.Down,
+            22500 => DPadDirection.Down | DPadDirection.Left,
+            27000 => DPadDirection.Left,
+            31500 => DPadDirection.Up | DPadDirection.Left,
+            _ => throw new ArgumentException(nameof(dpadIndex))
+        };
     }
 
     private IEnumerable<DirectInputSource> GetButtonSources()
     {
-        var buttonObjectInstances = joystick.GetObjects(DeviceObjectTypeFlags.Button)
+        return joystick.GetObjects(DeviceObjectTypeFlags.Button)
             .Where(b => b.Usage > 0)
             .OrderBy(b => b.ObjectId.InstanceNumber)
             .Take(MaxButtons)
-            .ToArray();
-
-        return buttonObjectInstances.Select((b, i) => new DirectInputSource(this, $"Button {b.Usage}",
-            InputSourceTypes.Button, b.Offset, state => state.Buttons[i] ? 1 : 0));
+            .Select((b, i) => new DirectInputSource(
+                inputDevice:this, 
+                name: $"Button {b.Usage}",
+                type: InputSourceTypes.Button, 
+                offset: b.Offset, 
+                state => state.Buttons[i] ? 1 : 0));
     }
+
 
     private IEnumerable<DirectInputSource> GetAxisSources()
     {
@@ -184,19 +180,18 @@ public sealed class DirectDevice : IInputDevice
 
     private IEnumerable<DirectInputSource> GetDpadSources()
     {
-        if (joystick.Capabilities.PovCount <= 0) return new DirectInputSource[0];
-
-        return Enumerable.Range(0, joystick.Capabilities.PovCount)
+        if (dpadCount <= 0) return Array.Empty<DirectInputSource>();
+        return Enumerable.Range(0, dpadCount)
             .SelectMany(i => new DirectInputSource[]
             {
                 new(this, $"DPad{i + 1} Up", InputSourceTypes.Dpad, DPadOffsetBase + i * 4,
-                    state => GetDPadValue(i).HasFlag(DPadDirection.Up) ? 1 : 0),
+                    state => GetDPadValue(i, state).HasFlag(DPadDirection.Up) ? 1 : 0),
                 new(this, $"DPad{i + 1} Down", InputSourceTypes.Dpad, DPadOffsetBase + i * 4 + 1,
-                    state => GetDPadValue(i).HasFlag(DPadDirection.Down) ? 1 : 0),
+                    state => GetDPadValue(i, state).HasFlag(DPadDirection.Down) ? 1 : 0),
                 new(this, $"DPad{i + 1} Left", InputSourceTypes.Dpad, DPadOffsetBase + i * 4 + 2,
-                    state => GetDPadValue(i).HasFlag(DPadDirection.Left) ? 1 : 0),
+                    state => GetDPadValue(i, state).HasFlag(DPadDirection.Left) ? 1 : 0),
                 new(this, $"DPad{i + 1} Right", InputSourceTypes.Dpad, DPadOffsetBase + i * 4 + 3,
-                    state => GetDPadValue(i).HasFlag(DPadDirection.Right) ? 1 : 0)
+                    state => GetDPadValue(i, state).HasFlag(DPadDirection.Right) ? 1 : 0)
             });
     }
 
@@ -219,42 +214,53 @@ public sealed class DirectDevice : IInputDevice
 
     private void InitializeForceFeedback()
     {
-        if (deviceInstance.ForceFeedbackDriverGuid == Guid.Empty) return;
-        var constantForce = joystick.GetEffects().FirstOrDefault(x => x.Guid == EffectGuid.ConstantForce);
-        var force = constantForce ?? joystick.GetEffects().FirstOrDefault();
+        var supportsForceFeedback = deviceInstance.ForceFeedbackDriverGuid != Guid.Empty;
+        if (!supportsForceFeedback) return;
+        var force = joystick.GetEffects().FirstOrDefault(x => x.Guid == EffectGuid.ConstantForce)
+                    ?? joystick.GetEffects().FirstOrDefault();
         var actuatorAxes = joystick.GetObjects()
             .Where(doi => doi.ObjectId.Flags.HasFlag(DeviceObjectTypeFlags.ForceFeedbackActuator))
             .ToArray();
 
-        for (var i = 0; i < actuatorAxes.Length; i++)
-            if (i + 1 < actuatorAxes.Length)
-            {
-                actuators.Add(new DirectDeviceForceFeedback(joystick, force, actuatorAxes[i], actuatorAxes[i + 1]));
-                i++;
-            }
-            else
-            {
-                actuators.Add(new DirectDeviceForceFeedback(joystick, force, actuatorAxes[i]));
-            }
+        for (var i = 0; i < actuatorAxes.Length; i += 2)
+        {
+            var axis1 = actuatorAxes[i];
+            var axis2 = (i + 1 < actuatorAxes.Length) ? actuatorAxes[i + 1] : null;
+            actuators.Add(new DirectDeviceForceFeedback(joystick, force, axis1, axis2));
+        }
     }
 
     private void LogDeviceInformation()
     {
-        // Log.Information(joystick.Properties.InstanceName + " " + ToString());
-        // foreach (var obj in joystick.GetObjects())
-        //     Log.Information(
-        //         $"  {obj.Name} {obj.ObjectId} offset: {obj.Offset} objecttype: {obj.ObjectType} {obj.Usage}");
+        Log.Information(joystick.Properties.InstanceName + " " + ToString());
+        foreach (var obj in joystick.GetObjects())
+            Log.Information(
+                $"  {obj.Name} {obj.ObjectId} offset: {obj.Offset} objecttype: {obj.ObjectType} {obj.Usage}");
     }
 
-    private Thread CreateInputRefresherThread()
+    private Thread StartInputRefresherThread()
     {
-        var inputRefresherThread = new Thread(InputRefresher)
+        var inputRefresherThread = new Thread(() =>
+        {
+            try
+            {
+                while (true)
+                {
+                    RefreshInput();
+                    Thread.Sleep(InputReadDelayMs);
+                }
+            }
+            catch (ThreadInterruptedException)
+            {
+                // Thread has been interrupted
+            }
+        })
         {
             Name = $"{ToString()} input reader",
             IsBackground = true
         };
-
         inputRefresherThread.SetApartmentState(ApartmentState.STA);
+        inputRefresherThread.Start();
         return inputRefresherThread;
     }
 
@@ -273,26 +279,14 @@ public sealed class DirectDevice : IInputDevice
         return UniqueId;
     }
 
-    private void InputRefresher()
-    {
-        try
-        {
-            while (Connected) Thread.Sleep(ReadDelayMs);
-        }
-        catch (ThreadInterruptedException)
-        {
-            // Thread has been interrupted
-        }
-    }
-
     /// <summary>
     ///     Gets the current value of an axis.
     /// </summary>
     /// <param name="axis">Axis index</param>
     /// <returns>Value</returns>
-    private int GetAxisValue(int instanceNumber)
+    private int GetAxisValue(int instanceNumber, JoystickState joystickState)
     {
-        var currentState = GetCurrentState();
+        var currentState = joystickState;
         if (instanceNumber < 0) throw new ArgumentException(nameof(instanceNumber));
         switch (instanceNumber)
         {
@@ -354,42 +348,18 @@ public sealed class DirectDevice : IInputDevice
     /// </summary>
     /// <param name="slider">Slider index</param>
     /// <returns>Value</returns>
-    private int GetSliderValue(int slider)
+    private int GetSliderValue(int slider, JoystickState joystickState)
     {
-        var currentState = GetCurrentState();
+        var currentState = joystickState;
         if (slider < 1) throw new ArgumentException(nameof(slider));
         return currentState.Sliders[slider - 1];
-    }
-
-    /// <summary>
-    ///     Gets the current value of a DPad.
-    /// </summary>
-    /// <param name="dpad">DPad index</param>
-    /// <returns>Value</returns>
-    private DPadDirection GetDPadValue(int dpad)
-    {
-        var currentState = GetCurrentState();
-        switch (currentState.PointOfViewControllers[dpad])
-        {
-            case -1: return DPadDirection.None;
-            case 0: return DPadDirection.Up;
-            case 4500: return DPadDirection.Up | DPadDirection.Right;
-            case 9000: return DPadDirection.Right;
-            case 13500: return DPadDirection.Down | DPadDirection.Right;
-            case 18000: return DPadDirection.Down;
-            case 22500: return DPadDirection.Down | DPadDirection.Left;
-            case 27000: return DPadDirection.Left;
-            case 31500: return DPadDirection.Up | DPadDirection.Left;
-            default:
-                throw new ArgumentException(nameof(dpad));
-        }
     }
 
     /// <summary>
     ///     Gets and initializes available axes for the device.
     /// </summary>
     /// <returns><see cref="DirectInputTypes" /> of the axes</returns>
-    private DeviceObjectInstance[] GetAxes()
+    private IEnumerable<DeviceObjectInstance> GetAxes()
     {
         var axes = joystick.GetObjects(DeviceObjectTypeFlags.AbsoluteAxis).Where(o => o.ObjectType != ObjectGuid.Slider)
             .ToArray();
@@ -415,26 +385,9 @@ public sealed class DirectDevice : IInputDevice
     ///     Gets available sliders for the device.
     /// </summary>
     /// <returns><see cref="DirectInputTypes" /> of the axes</returns>
-    private DeviceObjectInstance[] GetSliders()
+    private IEnumerable<DeviceObjectInstance> GetSliders()
     {
         return joystick.GetObjects().Where(o => o.ObjectType == ObjectGuid.Slider).ToArray();
-    }
-
-    /// <summary>
-    ///     Reads the current state of the device.
-    /// </summary>
-    /// <returns>state</returns>
-    private JoystickState GetCurrentState()
-    {
-        try
-        {
-            return joystick.GetCurrentState();
-        }
-        catch (Exception)
-        {
-            Connected = false;
-            throw;
-        }
     }
 
     private DirectInputSource GetAxisSource(DeviceObjectInstance instance)
@@ -453,14 +406,14 @@ public sealed class DirectDevice : IInputDevice
             axisCount = instance.ObjectId.InstanceNumber;
         var name = instance.Name;
         return new DirectInputSource(this, name, type, instance.Offset,
-            _ => GetAxisValue(axisCount) / (double)ushort.MaxValue);
+            state => GetAxisValue(axisCount, state) / (double)ushort.MaxValue);
     }
 
     private DirectInputSource GetSliderSource(DeviceObjectInstance instance, int i)
     {
         var name = instance.Name;
         return new DirectInputSource(this, name, InputSourceTypes.Slider, instance.Offset,
-            _ => GetSliderValue(i + 1) / (double)ushort.MaxValue);
+            state => GetSliderValue(i + 1, state) / (double)ushort.MaxValue);
     }
 
     #region Events
@@ -517,12 +470,12 @@ public sealed class DirectDevice : IInputDevice
     /// <summary>
     ///     <para>Implements <see cref="IDevice.DPads" /></para>
     /// </summary>
-    public IEnumerable<DPadDirection> DPads => state.DPads;
+    public IEnumerable<DPadDirection> DPads => dpadSources.Select((source, i) => GetDPadValue(i, joystickState));
 
     /// <summary>
-    ///     <para>Implements <see cref="IDevice.Sources" /></para>
+    ///     <para>Implements <see cref="IDevice.InputSources" /></para>
     /// </summary>
-    public IEnumerable<InputSource> Sources => sources;
+    public IEnumerable<InputSource> InputSources => inputSources;
 
     /// <summary>
     ///     <para>Implements <see cref="IInputDevice.ForceFeedbackCount" /></para>
@@ -540,6 +493,31 @@ public sealed class DirectDevice : IInputDevice
         {
             if (deviceInstance.IsHumanInterfaceDevice) return IdHelper.GetHardwareId(joystick.Properties.InterfacePath);
             return null;
+        }
+    }
+    
+    
+    /// <summary>
+    ///     Disposes all resources.
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (!disposed)
+        {
+            if (disposing)
+            {
+                inputRefresher?.Interrupt();
+                inputRefresher?.Join();
+                joystick.Unacquire();
+                joystick.Dispose();
+            }
+            disposed = true;
         }
     }
 

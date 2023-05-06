@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Serilog;
 using XOutput.Devices;
 
 namespace XOutput.UI.Component;

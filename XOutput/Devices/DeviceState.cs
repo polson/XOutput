@@ -16,27 +16,27 @@ public class DeviceState
     /// </summary>
     protected readonly List<InputSource> changedSources;
 
-    protected DPadDirection[] dPads;
-    protected IEnumerable<InputSource> values;
+    protected DPadDirection[] dpadDirections;
+    protected IEnumerable<InputSource> inputSources;
 
-    public DeviceState(IEnumerable<InputSource> types, int dPadCount)
+    public DeviceState(IEnumerable<InputSource> inputSources, int dPadCount)
     {
-        values = types.ToArray();
-        changedSources = new List<InputSource>(types.Count());
-        dPads = new DPadDirection[dPadCount];
-        allDpads = Enumerable.Range(0, dPads.Length).ToList();
+        this.inputSources = inputSources.ToArray();
+        changedSources = new List<InputSource>(inputSources.Count());
+        dpadDirections = new DPadDirection[dPadCount];
+        allDpads = Enumerable.Range(0, dpadDirections.Length).ToList();
         changedDpad = new List<int>();
     }
 
     /// <summary>
     ///     Gets the current values.
     /// </summary>
-    public IEnumerable<InputSource> Values => values;
+    public IEnumerable<InputSource> InputSources => inputSources;
 
     /// <summary>
     ///     Gets the current DPad values.
     /// </summary>
-    public IEnumerable<DPadDirection> DPads => dPads;
+    public IEnumerable<DPadDirection> DpadDirections => dpadDirections;
 
     /// <summary>
     ///     Sets new DPad values.
@@ -45,10 +45,10 @@ public class DeviceState
     /// <returns>changed DPad indices</returns>
     public bool SetDPad(int i, DPadDirection newValue)
     {
-        var oldValue = dPads[i];
+        var oldValue = dpadDirections[i];
         if (newValue != oldValue)
         {
-            dPads[i] = newValue;
+            dpadDirections[i] = newValue;
             changedDpad.Add(i);
             return true;
         }
@@ -67,13 +67,13 @@ public class DeviceState
         changedSources.Add(source);
     }
 
-    public IEnumerable<InputSource> GetChanges(bool force = false)
+    public IEnumerable<InputSource> GetChanges()
     {
-        return force ? values : changedSources;
+        return changedSources;
     }
 
-    public IEnumerable<int> GetChangedDpads(bool force = false)
+    public IEnumerable<int> GetChangedDpads()
     {
-        return force ? allDpads : changedDpad;
+        return changedDpad;
     }
 }

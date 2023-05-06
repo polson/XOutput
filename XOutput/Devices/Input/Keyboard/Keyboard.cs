@@ -77,20 +77,18 @@ public sealed class Keyboard : IInputDevice
     ///     Refreshes the current state. Triggers <see cref="InputChanged" /> event.
     /// </summary>
     /// <returns>if the input was available</returns>
-    public bool RefreshInput(bool force = false)
+    public void RefreshInput()
     {
         state.ResetChanges();
         foreach (var source in sources)
             if (source.Refresh())
                 state.MarkChanged(source);
-        var changes = state.GetChanges(force);
+        var changes = state.GetChanges();
         if (changes.Any())
         {
             deviceInputChangedEventArgs.Refresh(changes);
             InputChanged?.Invoke(this, deviceInputChangedEventArgs);
         }
-
-        return true;
     }
 
     ~Keyboard()
@@ -174,7 +172,7 @@ public sealed class Keyboard : IInputDevice
     ///     Returns all know keys to keyboard.
     ///     <para>Implements <see cref="IDevice.Buttons" /></para>
     /// </summary>
-    public IEnumerable<InputSource> Sources => sources;
+    public IEnumerable<InputSource> InputSources => sources;
 
     /// <summary>
     ///     Keyboards have no force feedback motors.

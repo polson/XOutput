@@ -18,6 +18,6 @@ public class KeyboardSource : InputSource
     internal bool Refresh()
     {
         double newValue = System.Windows.Input.Keyboard.IsKeyDown(key) ? 1 : 0;
-        return RefreshValue(newValue);
+        return UpdateValue(newValue);
     }
 }

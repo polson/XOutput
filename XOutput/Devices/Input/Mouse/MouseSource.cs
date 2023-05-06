@@ -25,6 +25,6 @@ public class MouseSource : InputSource
 
     internal bool Refresh()
     {
-        return RefreshValue(state);
+        return UpdateValue(state);
     }
 }

@@ -98,15 +98,15 @@ public class ControllerSettingsViewModel : ViewModelBase<ControllerSettingsModel
 
     private void CreateXInputControls()
     {
-        foreach (var buttonInput in controller.XInput.Sources.Where(s => s.Type == InputSourceTypes.Button))
+        foreach (var buttonInput in controller.XInput.InputSources.Where(s => s.Type == InputSourceTypes.Button))
             Model.XInputButtonViews.Add(new ButtonView(new ButtonViewModel(new ButtonModel(), buttonInput)));
         Model.XInputDPadViews.Add(new DPadView(new DPadViewModel(new DPadModel(), 0, false)));
-        var lx = controller.XInput.Sources.OfType<XOutputSource>().First(s => s.XInputType == XInputTypes.LX);
-        var ly = controller.XInput.Sources.OfType<XOutputSource>().First(s => s.XInputType == XInputTypes.LY);
-        var rx = controller.XInput.Sources.OfType<XOutputSource>().First(s => s.XInputType == XInputTypes.RX);
-        var ry = controller.XInput.Sources.OfType<XOutputSource>().First(s => s.XInputType == XInputTypes.RY);
-        var l2 = controller.XInput.Sources.OfType<XOutputSource>().First(s => s.XInputType == XInputTypes.L2);
-        var r2 = controller.XInput.Sources.OfType<XOutputSource>().First(s => s.XInputType == XInputTypes.R2);
+        var lx = controller.XInput.InputSources.OfType<XOutputSource>().First(s => s.XInputType == XInputTypes.LX);
+        var ly = controller.XInput.InputSources.OfType<XOutputSource>().First(s => s.XInputType == XInputTypes.LY);
+        var rx = controller.XInput.InputSources.OfType<XOutputSource>().First(s => s.XInputType == XInputTypes.RX);
+        var ry = controller.XInput.InputSources.OfType<XOutputSource>().First(s => s.XInputType == XInputTypes.RY);
+        var l2 = controller.XInput.InputSources.OfType<XOutputSource>().First(s => s.XInputType == XInputTypes.L2);
+        var r2 = controller.XInput.InputSources.OfType<XOutputSource>().First(s => s.XInputType == XInputTypes.R2);
         Model.XInputAxisViews.Add(new Axis2DView(new Axis2DViewModel(new Axis2DModel(), lx, ly)));
         Model.XInputAxisViews.Add(new Axis2DView(new Axis2DViewModel(new Axis2DModel(), rx, ry)));
         Model.XInputAxisViews.Add(new AxisView(new AxisViewModel(new AxisModel(), l2)));

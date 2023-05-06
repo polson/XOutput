@@ -78,9 +78,9 @@ public class InputSettingsViewModel : ViewModelBase<InputSettingsModel>, IDispos
     private void CreateInputControls()
     {
         CreateInputAxes();
-        foreach (var buttonInput in device.Sources.Where(s => s.Type == InputSourceTypes.Button))
+        foreach (var buttonInput in device.InputSources.Where(s => s.Type == InputSourceTypes.Button))
             Model.InputButtonViews.Add(new ButtonView(new ButtonViewModel(new ButtonModel(), buttonInput)));
-        foreach (var sliderInput in device.Sources.Where(s => s.Type == InputSourceTypes.Slider))
+        foreach (var sliderInput in device.InputSources.Where(s => s.Type == InputSourceTypes.Slider))
             Model.InputAxisViews.Add(new AxisView(new AxisViewModel(new AxisModel(), sliderInput)));
         foreach (var dPadInput in Enumerable.Range(0, device.DPads.Count()))
             Model.InputDPadViews.Add(new DPadView(new DPadViewModel(new DPadModel(), dPadInput, true)));
@@ -120,7 +120,7 @@ public class InputSettingsViewModel : ViewModelBase<InputSettingsModel>, IDispos
 
     private void CreateInputAxes()
     {
-        var axes = device.Sources.Where(s => InputSourceTypes.Axis.HasFlag(s.Type)).ToArray();
+        var axes = device.InputSources.Where(s => InputSourceTypes.Axis.HasFlag(s.Type)).ToArray();
         foreach (var z in axes)
             if (axes.Contains(z))
                 Model.InputAxisViews.Add(new AxisView(new AxisViewModel(new AxisModel(), z)));

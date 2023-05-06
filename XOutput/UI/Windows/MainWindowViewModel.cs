@@ -69,8 +69,8 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
         CheckVigemAvailable();
         RefreshInputDevices();
         SetupTimer();
-        // AddKeyboardController();
-        // AddMouseController();
+        AddKeyboardController();
+        AddMouseController();
         AddOutputControllers();
     }
 
@@ -121,7 +121,7 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
     {
         foreach (var mapping in settings.Mapping)
         {
-            // AddController(mapping);
+            AddController(mapping);
         }
     }
 
@@ -247,7 +247,7 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
                 device = directInputDevices.CreateDirectDevice(dinputDevice, displayName);
                 if (device == null) continue;
 
-                // var inputConfig = settings.GetOrCreateInputConfiguration(device.ToString(), device.InputConfiguration);
+                var inputConfig = settings.GetOrCreateInputConfiguration(device.ToString(), device.InputConfiguration);
                 device.Disconnected -= DispatchRefreshGameControllers;
                 device.Disconnected += DispatchRefreshGameControllers;
                 InputDevices.Instance.Add(device);
@@ -274,9 +274,7 @@ public class MainWindowViewModel : ViewModelBase<MainWindowModel>, IDisposable
             var mapper = settings.CreateMapper(controller.Mapper.Id);
             controller.Mapper.Mappings = mapper.Mappings;
         }
-
-        //TODO:
-        // Controllers.Instance.Update();
+        Controllers.Instance.Update(InputDevices.Instance.GetDevices());
     }
 
     private string CalculateDisplayName(DeviceInstance dinputDevice)

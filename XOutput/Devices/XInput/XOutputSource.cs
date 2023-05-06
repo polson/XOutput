@@ -20,7 +20,7 @@ public class XOutputSource : InputSource
         if (mappingCollection != null)
         {
             var newValue = mappingCollection.GetValue(XInputType);
-            return RefreshValue(newValue);
+            return UpdateValue(newValue);
         }
 
         return false;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Serilog;
 using XOutput.Devices.Input;
 using XOutput.Devices.Mapper;
 
@@ -14,8 +15,7 @@ public sealed class XOutputDevice : IDevice
 {
     private readonly DPadDirection[] dPads = new DPadDirection[DPadCount];
     private readonly InputMapper mapper;
-    private readonly XOutputSource[] sources;
-    private readonly DeviceState state;
+    private readonly XOutputSource[] inputSources;
 
     private IEnumerable<IInputDevice> boundSources = new List<IInputDevice>();
     private readonly DeviceInputChangedEventArgs deviceInputChangedEventArgs;
@@ -28,8 +28,7 @@ public sealed class XOutputDevice : IDevice
     public XOutputDevice(InputMapper mapper)
     {
         this.mapper = mapper;
-        sources = XInputHelper.Instance.GenerateSources();
-        state = new DeviceState(sources, DPadCount);
+        inputSources = XInputHelper.Instance.GenerateSources();
         deviceInputChangedEventArgs = new DeviceInputChangedEventArgs(this);
     }
 
@@ -63,24 +62,24 @@ public sealed class XOutputDevice : IDevice
     ///     Refreshes the current state. Triggers <see cref="InputChanged" /> event.
     /// </summary>
     /// <returns>if the input was available</returns>
-    public bool RefreshInput(bool force = false)
+    public void RefreshInput()
     {
-        state.ResetChanges();
-        foreach (var s in sources)
-            if (s.Refresh(mapper))
-                state.MarkChanged(s);
-        var changes = state.GetChanges(force);
-        dPads[0] = DPadHelper.GetDirection(GetBool(XInputTypes.UP), GetBool(XInputTypes.DOWN),
-            GetBool(XInputTypes.LEFT), GetBool(XInputTypes.RIGHT));
-        state.SetDPad(0, dPads[0]);
-        var changedDPads = state.GetChangedDpads(force);
-        if (changedDPads.Any() || changes.Any())
-        {
-            deviceInputChangedEventArgs.Refresh(changes, changedDPads);
-            InputChanged?.Invoke(this, deviceInputChangedEventArgs);
-        }
-
-        return true;
+        Log.Information(">> Refreshing XOutput device input");
+        var changedSources = inputSources
+            .Where(source => source.Refresh(mapper))
+            .Cast<InputSource>()
+            .ToList();
+        
+        dPads[0] = DPadHelper.GetDirection(
+            GetBool(XInputTypes.UP),
+            GetBool(XInputTypes.DOWN),
+            GetBool(XInputTypes.LEFT),
+            GetBool(XInputTypes.RIGHT));
+        
+        if (!changedSources.Any()) return;
+        
+        deviceInputChangedEventArgs.Refresh(changedSources);
+        InputChanged?.Invoke(this, deviceInputChangedEventArgs);
     }
 
     ~XOutputDevice()
@@ -90,10 +89,11 @@ public sealed class XOutputDevice : IDevice
 
     public void UpdateSources(IEnumerable<IInputDevice> sources)
     {
+        Log.Information(">> Updating XOutput device sources: {0}", sources.Count());
         foreach (var source in boundSources) source.InputChanged -= SourceInputChanged;
         boundSources = sources;
         foreach (var source in boundSources) source.InputChanged += SourceInputChanged;
-        RefreshInput(true);
+        RefreshInput();
     }
 
     private void SourceInputChanged(object sender, DeviceInputChangedEventArgs e)
@@ -108,7 +108,7 @@ public sealed class XOutputDevice : IDevice
     public Dictionary<XInputTypes, double> GetValues()
     {
         var newValues = new Dictionary<XInputTypes, double>();
-        foreach (var source in sources) newValues[source.XInputType] = source.Value;
+        foreach (var source in inputSources) newValues[source.XInputType] = source.Value;
         return newValues;
     }
 
@@ -131,7 +131,7 @@ public sealed class XOutputDevice : IDevice
     public double Get(Enum inputType)
     {
         var type = inputType as XInputTypes?;
-        if (type.HasValue) return sources.First(s => s.XInputType == type.Value).Value;
+        if (type.HasValue) return inputSources.First(s => s.XInputType == type.Value).Value;
         return 0;
     }
 
@@ -154,7 +154,7 @@ public sealed class XOutputDevice : IDevice
     /// <summary>
     ///     <para>Implements <see cref="IDevice.Buttons" /></para>
     /// </summary>
-    public IEnumerable<InputSource> Sources => sources;
+    public IEnumerable<InputSource> InputSources => inputSources;
 
     #endregion
 }

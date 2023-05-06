@@ -85,7 +85,7 @@ public class InputMapper
                     if (mapperData.InputDevice == inputDevice.DisplayName)
                     {
                         mapperData.SetSourceWithoutSaving(
-                            inputDevice.Sources.FirstOrDefault(s => s.Offset.ToString() == mapperData.InputType));
+                            inputDevice.InputSources.FirstOrDefault(s => s.Offset.ToString() == mapperData.InputType));
                         inputs.Add(inputDevice);
                         found = true;
                         break;

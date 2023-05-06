@@ -56,7 +56,7 @@ public partial class App : Application
             .MinimumLevel.Debug()
             .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
             .Enrich.FromLogContext()
-            .WriteTo.File("xoutput.log")
+            .WriteTo.File(logFilePath)
             .CreateLogger();
     }
 
