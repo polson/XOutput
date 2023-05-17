@@ -51,7 +51,7 @@ public sealed class DirectInputDevices : IDisposable
     /// <param name="deviceInstance">native instance</param>
     /// <returns>Wrapped instance</returns>
     public DirectDevice CreateDirectDevice(DeviceInstance deviceInstance, string deviceName)
-    {
+    { 
         if (deviceInstance.ProductGuid.ToString() == EmulatedSCPID)
         {
             return null;

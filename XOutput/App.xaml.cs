@@ -22,7 +22,8 @@ public partial class App : Application
 
     public App()
     {
-        setupLogging();
+        SetupLogging();
+        SetupInputRefresher();
         var dependencyEmbedder = new DependencyEmbedder();
         dependencyEmbedder.AddPackage("Newtonsoft.Json");
         dependencyEmbedder.AddPackage("SharpDX.DirectInput");
@@ -45,7 +46,13 @@ public partial class App : Application
 #endif
     }
 
-    private void setupLogging()
+    private void SetupInputRefresher()
+    {
+        var refresher = new InputRefresher(0.5);
+        refresher.Start();
+    }
+
+    private void SetupLogging()
     {
         const string logFilePath = "xoutput.log";
         if (File.Exists(logFilePath))
@@ -60,10 +67,11 @@ public partial class App : Application
             .CreateLogger();
     }
 
-    public async Task UnhandledException(Exception exceptionObject)
+    public Task UnhandledException(Exception exceptionObject)
     {
         Log.Error(exceptionObject, "Exception");
         MessageBox.Show(exceptionObject.Message + Environment.NewLine + exceptionObject.StackTrace);
+        return Task.CompletedTask;
     }
 
     private void Application_Startup(object sender, StartupEventArgs e)
@@ -91,7 +99,7 @@ public partial class App : Application
             mainWindowViewModel?.Dispose();
             ApplicationContext.Global.Close();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             //YOLO
         }

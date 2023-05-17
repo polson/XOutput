@@ -27,7 +27,7 @@ public partial class InputSettingsWindow : Window, IViewBase<InputSettingsViewMo
     private void WindowLoaded(object sender, RoutedEventArgs e)
     {
         ViewModel.Update();
-        timer.Interval = TimeSpan.FromMilliseconds(10);
+        timer.Interval = TimeSpan.FromMilliseconds(1);
         timer.Tick += TimerTick;
         timer.Start();
     }

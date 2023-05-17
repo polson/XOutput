@@ -136,7 +136,7 @@ public partial class MainWindow : Window, IViewBase<MainWindowViewModel, MainWin
         }
     }
 
-    private async void WindowClosed(object sender, EventArgs e)
+    private void WindowClosed(object sender, EventArgs e)
     {
         ViewModel.Dispose();
         Serilog.Log.Information("The application will exit.");

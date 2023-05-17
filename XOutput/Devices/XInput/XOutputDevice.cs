@@ -64,7 +64,6 @@ public sealed class XOutputDevice : IDevice
     /// <returns>if the input was available</returns>
     public void RefreshInput()
     {
-        Log.Information(">> Refreshing XOutput device input");
         var changedSources = inputSources
             .Where(source => source.Refresh(mapper))
             .Cast<InputSource>()
@@ -89,7 +88,6 @@ public sealed class XOutputDevice : IDevice
 
     public void UpdateSources(IEnumerable<IInputDevice> sources)
     {
-        Log.Information(">> Updating XOutput device sources: {0}", sources.Count());
         foreach (var source in boundSources) source.InputChanged -= SourceInputChanged;
         boundSources = sources;
         foreach (var source in boundSources) source.InputChanged += SourceInputChanged;

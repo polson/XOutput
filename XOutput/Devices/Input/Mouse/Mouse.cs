@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
+using Serilog;
 
 namespace XOutput.Devices.Input.Mouse;
 
@@ -128,7 +129,6 @@ public sealed class Mouse : IInputDevice
             // Thread has been interrupted
         }
     }
-
     #region Events
 
     /// <summary>

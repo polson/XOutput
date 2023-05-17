@@ -11,8 +11,6 @@ public class InputSettingsModel : ModelBase
 
     private string forceFeedbackText;
 
-    private bool hidGuardianAdded;
-
     private string testButtonText;
 
 

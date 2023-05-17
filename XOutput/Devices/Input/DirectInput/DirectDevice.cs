@@ -8,6 +8,7 @@ using Serilog;
 using SharpDX;
 using SharpDX.DirectInput;
 using XOutput.Tools;
+using Timer = System.Timers.Timer;
 
 namespace XOutput.Devices.Input.DirectInput;
 
@@ -43,16 +44,15 @@ public sealed class DirectDevice : IInputDevice
     {
         this.deviceInstance = deviceInstance;
         this.joystick = joystick;
+        dpadCount = joystick.Capabilities.PovCount;
         DisplayName = displayName;
         InitializeJoystick();
         InitializeForceFeedback();
         LogDeviceInformation();
         inputSources = GetInputSources();
-        dpadCount = joystick.Capabilities.PovCount;
         deviceInputChangedEventArgs = new DeviceInputChangedEventArgs(this);
         InputConfiguration = new InputConfig(ForceFeedbackCount);
         Connected = true;
-        inputRefresher = StartInputRefresherThread();
     }
 
     private DirectInputSource[] GetInputSources()
@@ -102,12 +102,6 @@ public sealed class DirectDevice : IInputDevice
     {
         try
         {
-            // joystick.Poll();
-            // var datas = joystick.GetBufferedData();
-            // foreach (var state in datas)
-            // {
-            //     Log.Information("State: {0}", state);
-            // }
             joystickState = joystick.GetCurrentState();
             var changedSources = inputSources
                 .Where(source => source.Refresh(joystickState))
@@ -236,32 +230,6 @@ public sealed class DirectDevice : IInputDevice
         foreach (var obj in joystick.GetObjects())
             Log.Information(
                 $"  {obj.Name} {obj.ObjectId} offset: {obj.Offset} objecttype: {obj.ObjectType} {obj.Usage}");
-    }
-
-    private Thread StartInputRefresherThread()
-    {
-        var inputRefresherThread = new Thread(() =>
-        {
-            try
-            {
-                while (true)
-                {
-                    RefreshInput();
-                    Thread.Sleep(InputReadDelayMs);
-                }
-            }
-            catch (ThreadInterruptedException)
-            {
-                // Thread has been interrupted
-            }
-        })
-        {
-            Name = $"{ToString()} input reader",
-            IsBackground = true
-        };
-        inputRefresherThread.SetApartmentState(ApartmentState.STA);
-        inputRefresherThread.Start();
-        return inputRefresherThread;
     }
 
     ~DirectDevice()
@@ -512,13 +480,17 @@ public sealed class DirectDevice : IInputDevice
         {
             if (disposing)
             {
-                inputRefresher?.Interrupt();
-                inputRefresher?.Join();
                 joystick.Unacquire();
                 joystick.Dispose();
             }
             disposed = true;
         }
+    }
+    private void PrintCurrentUnixTimestamp()
+    {
+        var now = DateTimeOffset.Now;
+        var unixTimestamp = now.ToUnixTimeSeconds();
+        Log.Information(DisplayName + " " + unixTimestamp);
     }
 
     #endregion
