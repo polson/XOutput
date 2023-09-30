@@ -1,65 +1,67 @@
 ﻿using XOutput.Devices;
 
-namespace XOutput.UI.Component
+namespace XOutput.UI.Component;
+
+public class Axis2DModel : ModelBase
 {
-    public class Axis2DModel : ModelBase
+    private int maxx;
+
+    private int maxy;
+
+    private int valuex;
+
+    private int valuey;
+    public InputSource TypeX { get; set; }
+    public InputSource TypeY { get; set; }
+
+    public int ValueX
     {
-        public InputSource TypeX { get; set; }
-        public InputSource TypeY { get; set; }
-
-        private int valuex;
-        public int ValueX
+        get => valuex;
+        set
         {
-            get => valuex;
-            set
+            if (valuex != value)
             {
-                if (valuex != value)
-                {
-                    valuex = value;
-                    OnPropertyChanged(nameof(ValueX));
-                }
+                valuex = value;
+                OnPropertyChanged(nameof(ValueX));
             }
         }
+    }
 
-        private int valuey;
-        public int ValueY
+    public int ValueY
+    {
+        get => valuey;
+        set
         {
-            get => valuey;
-            set
+            if (valuey != value)
             {
-                if (valuey != value)
-                {
-                    valuey = value;
-                    OnPropertyChanged(nameof(ValueY));
-                }
+                valuey = value;
+                OnPropertyChanged(nameof(ValueY));
             }
         }
+    }
 
-        private int maxx;
-        public int MaxX
+    public int MaxX
+    {
+        get => maxx;
+        set
         {
-            get => maxx;
-            set
+            if (maxx != value)
             {
-                if (maxx != value)
-                {
-                    maxx = value;
-                    OnPropertyChanged(nameof(MaxX));
-                }
+                maxx = value;
+                OnPropertyChanged(nameof(MaxX));
             }
         }
+    }
 
-        private int maxy;
-        public int MaxY
+    public int MaxY
+    {
+        get => maxy;
+        set
         {
-            get => maxy;
-            set
+            if (maxy != value)
             {
-                if (maxy != value)
-                {
-                    maxy = value;
-                    OnPropertyChanged(nameof(MaxY));
-                }
+                maxy = value;
+                OnPropertyChanged(nameof(MaxY));
             }
         }
     }

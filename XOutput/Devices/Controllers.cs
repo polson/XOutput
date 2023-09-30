@@ -1,89 +1,64 @@
 ﻿using System.Collections.Generic;
 using XOutput.Devices.Input;
 
-namespace XOutput.Devices
+namespace XOutput.Devices;
+
+/// <summary>
+///     Threadsafe method to get ID of the controllers.
+/// </summary>
+public sealed class Controllers
 {
-    /// <summary>
-    /// Threadsafe method to get ID of the controllers.
-    /// </summary>
-    public sealed class Controllers
+    private readonly List<GameController> controllers = new();
+
+    private readonly List<int> ids = new();
+    private readonly object lockObject = new();
+
+    private Controllers()
     {
-        private static Controllers instance = new Controllers();
-        /// <summary>
-        /// Gets the singleton instance of the class.
-        /// </summary>
-        public static Controllers Instance => instance;
+    }
 
-        private readonly List<int> ids = new List<int>();
-        private readonly object lockObject = new object();
-        private readonly List<GameController> controllers = new List<GameController>();
+    /// <summary>
+    ///     Gets the singleton instance of the class.
+    /// </summary>
+    public static Controllers Instance { get; } = new();
 
-        private Controllers()
+    /// <summary>
+    ///     Disposes a used ID.
+    /// </summary>
+    /// <param name="id">ID to remove</param>
+    public void DisposeId(int id)
+    {
+        lock (lockObject)
         {
-
+            ids.Remove(id);
         }
+    }
 
-        /// <summary>
-        /// Gets a new ID.
-        /// </summary>
-        /// <returns></returns>
-        public int GetId()
-        {
-            lock (lockObject)
-            {
-                for (int i = 1; i <= int.MaxValue; i++)
-                {
-                    if (!ids.Contains(i))
-                    {
-                        ids.Add(i);
-                        return i;
-                    }
-                }
-                return 0;
-            }
-        }
+    public void Add(GameController controller)
+    {
+        controllers.Add(controller);
+        Update(controller, InputDevices.Instance.GetDevices());
+    }
 
-        /// <summary>
-        /// Disposes a used ID.
-        /// </summary>
-        /// <param name="id">ID to remove</param>
-        public void DisposeId(int id)
-        {
-            lock (lockObject)
-            {
-                ids.Remove(id);
-            }
-        }
+    public void Remove(GameController controller)
+    {
+        controllers.Remove(controller);
+        Update(controller, InputDevices.Instance.GetDevices());
+    }
 
-        public void Add(GameController controller)
-        {
-            controllers.Add(controller);
-            Update(controller, InputDevices.Instance.GetDevices());
-        }
+    public void Update(GameController controller, IEnumerable<IInputDevice> inputDevices)
+    {
+        controller.Mapper.Attach(inputDevices);
+        controller.XInput.UpdateSources(controller.Mapper.GetInputs());
+    }
 
-        public void Remove(GameController controller)
-        {
-            controllers.Remove(controller);
-            Update(controller, InputDevices.Instance.GetDevices());
-        }
+    public void Update(IEnumerable<IInputDevice> inputDevices)
+    {
+        foreach (var controller in controllers) Update(controller, inputDevices);
+    }
 
-        public void Update(GameController controller, IEnumerable<IInputDevice> inputDevices)
-        {
-            controller.Mapper.Attach(inputDevices);
-            controller.XInput.UpdateSources(controller.Mapper.GetInputs());
-        }
-
-        public void Update(IEnumerable<IInputDevice> inputDevices)
-        {
-            foreach (var controller in controllers)
-            {
-                Update(controller, inputDevices);
-            }
-        }
-
-        public IEnumerable<GameController> GetControllers()
-        {
-            return controllers.ToArray();
-        }
+    public IEnumerable<GameController> GetControllers()
+    {
+        return controllers.ToArray();
     }
 }

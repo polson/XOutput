@@ -1,38 +1,38 @@
 ﻿using System.Windows.Media;
 using XOutput.Devices.Input;
 
-namespace XOutput.UI.Component
+namespace XOutput.UI.Component;
+
+public class InputModel : ModelBase
 {
-    public class InputModel : ModelBase
+    private Brush background;
+    private IInputDevice device;
+
+    public IInputDevice Device
     {
-        private IInputDevice device;
-        public IInputDevice Device
+        get => device;
+        set
         {
-            get => device;
-            set
+            if (device != value)
             {
-                if (device != value)
-                {
-                    device = value;
-                    OnPropertyChanged(nameof(Device));
-                }
+                device = value;
+                OnPropertyChanged(nameof(Device));
             }
         }
-
-        private Brush background;
-        public Brush Background
-        {
-            get => background;
-            set
-            {
-                if (background != value)
-                {
-                    background = value;
-                    OnPropertyChanged(nameof(Background));
-                }
-            }
-        }
-
-        public string DisplayName { get { return string.Format("{0} ({1})", device.DisplayName, device.UniqueId); } }
     }
+
+    public Brush Background
+    {
+        get => background;
+        set
+        {
+            if (background != value)
+            {
+                background = value;
+                OnPropertyChanged(nameof(Background));
+            }
+        }
+    }
+
+    public string DisplayName => string.Format("{0} ({1})", device.DisplayName, device.UniqueId);
 }

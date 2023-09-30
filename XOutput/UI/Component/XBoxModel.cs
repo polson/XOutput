@@ -1,34 +1,34 @@
 ﻿using XOutput.Devices.XInput;
 
-namespace XOutput.UI
+namespace XOutput.UI;
+
+public class XBoxModel : ModelBase
 {
-    public class XBoxModel : ModelBase
+    private bool highlight;
+    private XInputTypes xInputType;
+
+    public XInputTypes XInputType
     {
-        private XInputTypes xInputType;
-        public XInputTypes XInputType
+        get => xInputType;
+        set
         {
-            get => xInputType;
-            set
+            if (xInputType != value)
             {
-                if (xInputType != value)
-                {
-                    xInputType = value;
-                    OnPropertyChanged(nameof(XInputType));
-                }
+                xInputType = value;
+                OnPropertyChanged(nameof(XInputType));
             }
         }
+    }
 
-        private bool highlight;
-        public bool Highlight
+    public bool Highlight
+    {
+        get => highlight;
+        set
         {
-            get => highlight;
-            set
+            if (highlight != value)
             {
-                if (highlight != value)
-                {
-                    highlight = value;
-                    OnPropertyChanged(nameof(Highlight));
-                }
+                highlight = value;
+                OnPropertyChanged(nameof(Highlight));
             }
         }
     }

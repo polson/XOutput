@@ -3,19 +3,16 @@ using System.Collections.ObjectModel;
 using XOutput.Diagnostics;
 using XOutput.UI.Component;
 
-namespace XOutput.UI.Windows
-{
-    public class DiagnosticsModel : ModelBase
-    {
-        private readonly ObservableCollection<DiagnosticsItemView> diagnostics = new ObservableCollection<DiagnosticsItemView>();
-        public ObservableCollection<DiagnosticsItemView> Diagnostics => diagnostics;
+namespace XOutput.UI.Windows;
 
-        public DiagnosticsModel(IEnumerable<IDiagnostics> diagnostics)
-        {
-            foreach (var diagnostic in diagnostics)
-            {
-                Diagnostics.Add(new DiagnosticsItemView(new DiagnosticsItemViewModel(new DiagnosticsItemModel(), diagnostic)));
-            }
-        }
+public class DiagnosticsModel : ModelBase
+{
+    public DiagnosticsModel(IEnumerable<IDiagnostics> diagnostics)
+    {
+        foreach (var diagnostic in diagnostics)
+            Diagnostics.Add(
+                new DiagnosticsItemView(new DiagnosticsItemViewModel(new DiagnosticsItemModel(), diagnostic)));
     }
+
+    public ObservableCollection<DiagnosticsItemView> Diagnostics { get; } = new();
 }

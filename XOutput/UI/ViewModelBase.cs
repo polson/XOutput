@@ -1,16 +1,14 @@
 ﻿using System.ComponentModel;
 
-namespace XOutput.UI
-{
-    public abstract class ViewModelBase<M> where M : ModelBase, INotifyPropertyChanged
-    {
-        public LanguageModel LanguageModel => LanguageModel.Instance;
-        private readonly M model;
-        public M Model => model;
+namespace XOutput.UI;
 
-        protected ViewModelBase(M model)
-        {
-            this.model = model;
-        }
+public abstract class ViewModelBase<M> where M : ModelBase, INotifyPropertyChanged
+{
+    protected ViewModelBase(M model)
+    {
+        this.Model = model;
     }
+
+    public LanguageModel LanguageModel => LanguageModel.Instance;
+    public M Model { get; }
 }

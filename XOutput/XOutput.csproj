@@ -1,50 +1,53 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net452</TargetFramework>
-    <UseWPF>true</UseWPF>
-    <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>XOutput</RootNamespace>
-    <AssemblyName>XOutput</AssemblyName>
-    <Authors>Ármin Csutorás</Authors>
-    <Product>XOutput</Product>
-    <PackageId>XOutput</PackageId>
-    <NeutralLanguage>en</NeutralLanguage>
-    <Description></Description>
-    <Copyright>Copyright 2019</Copyright>
-    <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/csutorasa/XOutput</PackageProjectUrl>
-    <!--<PackageIconUrl>Icon URL</PackageIconUrl>-->
-    <RepositoryUrl>https://github.com/csutorasa/XOutput</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net70-windows</TargetFramework>
+        <UseWPF>true</UseWPF>
+        <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
+        <AppDesignerFolder>Properties</AppDesignerFolder>
+        <RootNamespace>XOutput</RootNamespace>
+        <AssemblyName>XOutput</AssemblyName>
+        <Authors>Ármin Csutorás</Authors>
+        <Product>XOutput</Product>
+        <PackageId>XOutput</PackageId>
+        <NeutralLanguage>en</NeutralLanguage>
+        <Description></Description>
+        <Copyright>Copyright 2019</Copyright>
+        <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
+        <PackageProjectUrl>https://github.com/csutorasa/XOutput</PackageProjectUrl>
+        <!--<PackageIconUrl>Icon URL</PackageIconUrl>-->
+        <RepositoryUrl>https://github.com/csutorasa/XOutput</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.0.8" />
-    <PackageReference Include="Nefarius.ViGEm.Client" Version="1.16.148" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="SharpDX" Version="4.2.0" />
-    <PackageReference Include="SharpDX.DirectInput" Version="4.2.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System.Net.Http" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Remove="Resources\Languages\*.json" />
-    <EmbeddedResource Include="Resources\Languages\*.json" />
-  </ItemGroup>
-  <!-- Creating single file output -->
-  <ItemGroup>
-    <EmbeddedResource Include="$(NuGetPackageRoot)\newtonsoft.json\12.0.2\lib\net45\Newtonsoft.Json.dll" />
-    <EmbeddedResource Include="$(NuGetPackageRoot)\sharpdx\4.2.0\lib\net45\SharpDX.dll" />
-    <EmbeddedResource Include="$(NuGetPackageRoot)\sharpdx.directinput\4.2.0\lib\net45\SharpDX.DirectInput.dll" />
-    <EmbeddedResource Include="$(NuGetPackageRoot)\hardcodet.notifyicon.wpf\1.0.8\lib\net45\Hardcodet.Wpf.TaskbarNotification.dll" />
-    <EmbeddedResource Include="$(NuGetPackageRoot)\nefarius.vigem.client\1.16.148\lib\net452\Nefarius.ViGEm.Client.dll" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
+        <PackageReference Include="Nefarius.ViGEm.Client" Version="1.21.256" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageReference Include="Serilog" Version="3.0.0-dev-01984" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="4.1.1-dev-00910" />
+        <PackageReference Include="Serilog.Sinks.File" Version="5.0.1-dev-00947" />
+        <PackageReference Include="SharpDX" Version="4.2.0" />
+        <PackageReference Include="SharpDX.DirectInput" Version="4.2.0" />
+    </ItemGroup>
+    <ItemGroup>
+        <Reference Include="System.Net.Http" />
+    </ItemGroup>
+    <ItemGroup>
+        <Resource Include="Resources\icon.ico" />
+    </ItemGroup>
+    <ItemGroup>
+        <Content Remove="Resources\Languages\*.json" />
+        <EmbeddedResource Include="Resources\Languages\*.json" />
+    </ItemGroup>
+    <!-- Creating single file output -->
+    <ItemGroup>
+        <EmbeddedResource Include="$(NuGetPackageRoot)\newtonsoft.json\12.0.2\lib\net45\Newtonsoft.Json.dll" />
+        <EmbeddedResource Include="$(NuGetPackageRoot)\sharpdx\4.2.0\lib\net45\SharpDX.dll" />
+        <EmbeddedResource Include="$(NuGetPackageRoot)\sharpdx.directinput\4.2.0\lib\net45\SharpDX.DirectInput.dll" />
+        <EmbeddedResource Include="$(NuGetPackageRoot)\hardcodet.notifyicon.wpf\1.0.8\lib\net45\Hardcodet.Wpf.TaskbarNotification.dll" />
+        <EmbeddedResource Include="$(NuGetPackageRoot)\nefarius.vigem.client\1.16.148\lib\net452\Nefarius.ViGEm.Client.dll" />
+    </ItemGroup>
 
 </Project>

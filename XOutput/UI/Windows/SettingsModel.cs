@@ -1,91 +1,77 @@
 ﻿using System.Collections.ObjectModel;
 using XOutput.Tools;
 
-namespace XOutput.UI.Windows
+namespace XOutput.UI.Windows;
+
+public class SettingsModel : ModelBase
 {
-    public class SettingsModel : ModelBase
+    private readonly RegistryModifier registryModifier;
+    private readonly Settings settings;
+
+    private string selectedLanguage;
+
+    public SettingsModel(RegistryModifier registryModifier, Settings settings)
     {
-        private readonly Settings settings;
-        private readonly RegistryModifier registryModifier;
+        this.registryModifier = registryModifier;
+        this.settings = settings;
+    }
 
-        private readonly ObservableCollection<string> languages = new ObservableCollection<string>();
-        public ObservableCollection<string> Languages => languages;
+    public ObservableCollection<string> Languages { get; } = new();
 
-        private string selectedLanguage;
-        public string SelectedLanguage
+    public string SelectedLanguage
+    {
+        get
         {
-            get
+            selectedLanguage = LanguageManager.Instance.Language;
+            return selectedLanguage;
+        }
+        set
+        {
+            if (selectedLanguage != value)
             {
-                selectedLanguage = LanguageManager.Instance.Language;
-                return selectedLanguage;
-            }
-            set
-            {
-                if (selectedLanguage != value)
-                {
-                    selectedLanguage = value;
-                    LanguageManager.Instance.Language = value;
-                    OnPropertyChanged(nameof(SelectedLanguage));
-                }
+                selectedLanguage = value;
+                LanguageManager.Instance.Language = value;
+                OnPropertyChanged(nameof(SelectedLanguage));
             }
         }
+    }
 
-        public bool CloseToTray
+    public bool CloseToTray
+    {
+        get => settings.CloseToTray;
+        set
         {
-            get => settings.CloseToTray;
-            set
+            if (settings.CloseToTray != value)
             {
-                if (settings.CloseToTray != value)
-                {
-                    settings.CloseToTray = value;
-                    OnPropertyChanged(nameof(CloseToTray));
-                }
+                settings.CloseToTray = value;
+                OnPropertyChanged(nameof(CloseToTray));
             }
         }
+    }
 
-        public bool RunAtStartup
+    public bool RunAtStartup
+    {
+        get => registryModifier.Autostart;
+        set
         {
-            get => registryModifier.Autostart;
-            set
+            if (registryModifier.Autostart != value)
             {
-                if (registryModifier.Autostart != value)
-                {
-                    registryModifier.Autostart = value;
-                    OnPropertyChanged(nameof(RunAtStartup));
-                }
+                registryModifier.Autostart = value;
+                OnPropertyChanged(nameof(RunAtStartup));
             }
         }
+    }
 
-        public bool HidGuardianEnabled
+    public bool DisableAutoRefresh
+    {
+        get => settings.DisableAutoRefresh;
+        set
         {
-            get => settings.HidGuardianEnabled;
-            set
+            if (settings.DisableAutoRefresh != value)
             {
-                if (settings.HidGuardianEnabled != value)
-                {
-                    settings.HidGuardianEnabled = value;
-                    OnPropertyChanged(nameof(HidGuardianEnabled));
-                }
+                settings.DisableAutoRefresh = value;
+                OnPropertyChanged(nameof(DisableAutoRefresh));
             }
-        }
-
-        public bool DisableAutoRefresh
-        {
-            get => settings.DisableAutoRefresh;
-            set
-            {
-                if (settings.DisableAutoRefresh != value)
-                {
-                    settings.DisableAutoRefresh = value;
-                    OnPropertyChanged(nameof(DisableAutoRefresh));
-                }
-            }
-        }
-
-        public SettingsModel(RegistryModifier registryModifier, Settings settings)
-        {
-            this.registryModifier = registryModifier;
-            this.settings = settings;
         }
     }
 }

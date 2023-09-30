@@ -1,26 +1,26 @@
 ﻿using System.Windows.Controls;
 using XOutput.Devices;
 
-namespace XOutput.UI.Component
+namespace XOutput.UI.Component;
+
+/// <summary>
+///     Interaction logic for AxisView.xaml
+/// </summary>
+public partial class AxisView : UserControl, IUpdatableView, IViewBase<AxisViewModel, AxisModel>
 {
-    /// <summary>
-    /// Interaction logic for AxisView.xaml
-    /// </summary>
-    public partial class AxisView : UserControl, IUpdatableView, IViewBase<AxisViewModel, AxisModel>
+    protected readonly AxisViewModel viewModel;
+
+    public AxisView(AxisViewModel viewModel)
     {
-        protected readonly AxisViewModel viewModel;
-        public AxisViewModel ViewModel => viewModel;
-
-        public AxisView(AxisViewModel viewModel)
-        {
-            this.viewModel = viewModel;
-            DataContext = viewModel;
-            InitializeComponent();
-        }
-
-        public void UpdateValues(IDevice device)
-        {
-            viewModel.UpdateValues(device);
-        }
+        this.viewModel = viewModel;
+        DataContext = viewModel;
+        InitializeComponent();
     }
+
+    public void UpdateValues(IDevice device)
+    {
+        viewModel.UpdateValues(device);
+    }
+
+    public AxisViewModel ViewModel => viewModel;
 }

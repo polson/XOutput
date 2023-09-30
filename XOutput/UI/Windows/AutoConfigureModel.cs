@@ -2,96 +2,148 @@
 using XOutput.Devices;
 using XOutput.Devices.XInput;
 
-namespace XOutput.UI.Windows
+namespace XOutput.UI.Windows;
+
+public class AutoConfigureModel : ModelBase
 {
-    public class AutoConfigureModel : ModelBase
+    private Visibility buttonsVisibility;
+    private bool highlight;
+    private bool isAuto = true;
+    private InputSource maxType;
+    private double maxValue;
+    private double minValue;
+    private double timerMaxValue;
+    private double timerValue;
+    private Visibility timerVisibility;
+    private XInputTypes xInput;
+
+    public XInputTypes XInput
     {
-        private XInputTypes xInput;
-        public XInputTypes XInput
+        get => xInput;
+        set
         {
-            get => xInput;
-            set { if (xInput != value) { xInput = value; OnPropertyChanged(nameof(XInput)); } }
-        }
-        private bool isAuto = true;
-        public bool IsAuto
-        {
-            get => isAuto;
-            set { if (isAuto != value) { isAuto = value; OnPropertyChanged(nameof(IsAuto)); if (value) { MaxType = null; } } }
-        }
-        private bool highlight;
-        public bool Highlight
-        {
-            get => highlight;
-            set { if (highlight != value) { highlight = value; OnPropertyChanged(nameof(Highlight)); } }
-        }
-        private InputSource maxType;
-        public InputSource MaxType
-        {
-            get => maxType;
-            set { if (maxType != value) { maxType = value; OnPropertyChanged(nameof(MaxType)); } }
-        }
-        private double minValue;
-        public double MinValue
-        {
-            get => minValue;
-            set { if (minValue != value) { minValue = value; OnPropertyChanged(nameof(MinValue)); } }
-        }
-        private double maxValue;
-        public double MaxValue
-        {
-            get => maxValue;
-            set { if (maxValue != value) { maxValue = value; OnPropertyChanged(nameof(MaxValue)); } }
-        }
-        private Visibility buttonsVisibility;
-        public Visibility ButtonsVisibility
-        {
-            get => buttonsVisibility;
-            set
+            if (xInput != value)
             {
-                if (buttonsVisibility != value)
-                {
-                    buttonsVisibility = value;
-                    OnPropertyChanged(nameof(ButtonsVisibility));
-                }
+                xInput = value;
+                OnPropertyChanged(nameof(XInput));
             }
         }
-        private double timerMaxValue;
-        public double TimerMaxValue
+    }
+
+    public bool IsAuto
+    {
+        get => isAuto;
+        set
         {
-            get => timerMaxValue;
-            set
+            if (isAuto != value)
             {
-                if (timerMaxValue != value)
-                {
-                    timerMaxValue = value;
-                    OnPropertyChanged(nameof(TimerMaxValue));
-                }
+                isAuto = value;
+                OnPropertyChanged(nameof(IsAuto));
+                if (value) MaxType = null;
             }
         }
-        private double timerValue;
-        public double TimerValue
+    }
+
+    public bool Highlight
+    {
+        get => highlight;
+        set
         {
-            get => timerValue;
-            set
+            if (highlight != value)
             {
-                if (timerValue != value)
-                {
-                    timerValue = value;
-                    OnPropertyChanged(nameof(TimerValue));
-                }
+                highlight = value;
+                OnPropertyChanged(nameof(Highlight));
             }
         }
-        private Visibility timerVisibility;
-        public Visibility TimerVisibility
+    }
+
+    public InputSource MaxType
+    {
+        get => maxType;
+        set
         {
-            get => timerVisibility;
-            set
+            if (maxType != value)
             {
-                if (timerVisibility != value)
-                {
-                    timerVisibility = value;
-                    OnPropertyChanged(nameof(TimerVisibility));
-                }
+                maxType = value;
+                OnPropertyChanged(nameof(MaxType));
+            }
+        }
+    }
+
+    public double MinValue
+    {
+        get => minValue;
+        set
+        {
+            if (minValue != value)
+            {
+                minValue = value;
+                OnPropertyChanged(nameof(MinValue));
+            }
+        }
+    }
+
+    public double MaxValue
+    {
+        get => maxValue;
+        set
+        {
+            if (maxValue != value)
+            {
+                maxValue = value;
+                OnPropertyChanged(nameof(MaxValue));
+            }
+        }
+    }
+
+    public Visibility ButtonsVisibility
+    {
+        get => buttonsVisibility;
+        set
+        {
+            if (buttonsVisibility != value)
+            {
+                buttonsVisibility = value;
+                OnPropertyChanged(nameof(ButtonsVisibility));
+            }
+        }
+    }
+
+    public double TimerMaxValue
+    {
+        get => timerMaxValue;
+        set
+        {
+            if (timerMaxValue != value)
+            {
+                timerMaxValue = value;
+                OnPropertyChanged(nameof(TimerMaxValue));
+            }
+        }
+    }
+
+    public double TimerValue
+    {
+        get => timerValue;
+        set
+        {
+            if (timerValue != value)
+            {
+                timerValue = value;
+                OnPropertyChanged(nameof(TimerValue));
+            }
+        }
+    }
+
+    public Visibility TimerVisibility
+    {
+        get => timerVisibility;
+        set
+        {
+            if (timerVisibility != value)
+            {
+                timerVisibility = value;
+                OnPropertyChanged(nameof(TimerVisibility));
             }
         }
     }

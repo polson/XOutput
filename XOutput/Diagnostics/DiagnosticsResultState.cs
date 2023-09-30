@@ -1,12 +1,11 @@
-﻿namespace XOutput.Diagnostics
+﻿namespace XOutput.Diagnostics;
+
+/// <summary>
+///     Diagnostics result values enum.
+/// </summary>
+public enum DiagnosticsResultState
 {
-    /// <summary>
-    /// Diagnostics result values enum.
-    /// </summary>
-    public enum DiagnosticsResultState
-    {
-        Failed,
-        Warning,
-        Passed,
-    }
+    Failed,
+    Warning,
+    Passed
 }

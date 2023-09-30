@@ -1,14 +1,13 @@
-﻿namespace XOutput.Devices.Input
+﻿namespace XOutput.Devices.Input;
+
+/// <summary>
+///     Device input diagnostic types.
+/// </summary>
+public enum InputDiagnosticsTypes
 {
-    /// <summary>
-    /// Device input diagnostic types.
-    /// </summary>
-    public enum InputDiagnosticsTypes
-    {
-        AxesCount,
-        ButtonsCount,
-        DPadCount,
-        SlidersCount,
-        ForceFeedbackCount,
-    }
+    AxesCount,
+    ButtonsCount,
+    DPadCount,
+    SlidersCount,
+    ForceFeedbackCount
 }

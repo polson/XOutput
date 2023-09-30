@@ -2,47 +2,59 @@
 using System.Windows.Controls;
 using XOutput.Devices.XInput;
 
-namespace XOutput.UI.Component
+namespace XOutput.UI.Component;
+
+/// <summary>
+///     Interaction logic for XBox.xaml
+/// </summary>
+public partial class XBox : Viewbox, IViewBase<XBoxViewModel, XBoxModel>
 {
-    /// <summary>
-    /// Interaction logic for XBox.xaml
-    /// </summary>
-    public partial class XBox : Viewbox, IViewBase<XBoxViewModel, XBoxModel>
+    public static readonly DependencyProperty XInputTypeProperty = DependencyProperty.Register("XInputType",
+        typeof(XInputTypes), typeof(XBox), new FrameworkPropertyMetadata(OnXInputTypeChanged, null));
+
+    public static readonly DependencyProperty HighlightProperty = DependencyProperty.Register("Highlight", typeof(bool),
+        typeof(XBox), new FrameworkPropertyMetadata(OnHightlightChanged, null));
+
+    protected readonly XBoxViewModel viewModel;
+
+    public XBox()
     {
-        public static readonly DependencyProperty XInputTypeProperty = DependencyProperty.Register("XInputType", typeof(XInputTypes), typeof(XBox), new FrameworkPropertyMetadata(OnXInputTypeChanged, null));
-        public static readonly DependencyProperty HighlightProperty = DependencyProperty.Register("Highlight", typeof(bool), typeof(XBox), new FrameworkPropertyMetadata(OnHightlightChanged, null));
+        viewModel = new XBoxViewModel(new XBoxModel());
+        DataContext = viewModel;
+        InitializeComponent();
+    }
 
-        private static void OnXInputTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    public XInputTypes XInputType
+    {
+        get => (XInputTypes)GetValue(XInputTypeProperty);
+        set
         {
-            var xbox = (XBox)d;
-            xbox.ViewModel.Model.XInputType = (XInputTypes)e.NewValue;
+            SetValue(XInputTypeProperty, value);
+            ViewModel.Model.XInputType = value;
         }
+    }
 
-        private static void OnHightlightChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    public bool Highlight
+    {
+        get => (bool)GetValue(HighlightProperty);
+        set
         {
-            var xbox = (XBox)d;
-            xbox.ViewModel.Model.Highlight = (bool)e.NewValue;
+            SetValue(HighlightProperty, value);
+            ViewModel.Model.Highlight = value;
         }
+    }
 
-        public XInputTypes XInputType
-        {
-            get { return (XInputTypes)GetValue(XInputTypeProperty); }
-            set { SetValue(XInputTypeProperty, value); ViewModel.Model.XInputType = value; }
-        }
-        public bool Highlight
-        {
-            get { return (bool)GetValue(HighlightProperty); }
-            set { SetValue(HighlightProperty, value); ViewModel.Model.Highlight = value; }
-        }
+    public XBoxViewModel ViewModel => viewModel;
 
-        protected readonly XBoxViewModel viewModel;
-        public XBoxViewModel ViewModel => viewModel;
+    private static void OnXInputTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var xbox = (XBox)d;
+        xbox.ViewModel.Model.XInputType = (XInputTypes)e.NewValue;
+    }
 
-        public XBox()
-        {
-            viewModel = new XBoxViewModel(new XBoxModel());
-            DataContext = viewModel;
-            InitializeComponent();
-        }
+    private static void OnHightlightChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var xbox = (XBox)d;
+        xbox.ViewModel.Model.Highlight = (bool)e.NewValue;
     }
 }

@@ -1,38 +1,40 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using Serilog;
 
-namespace XOutput.Devices.Input
+namespace XOutput.Devices.Input;
+
+public class InputDevices
 {
-    public class InputDevices
+    private readonly List<IInputDevice> inputDevices = new();
+
+    private InputDevices()
     {
+    }
 
-        private static InputDevices instance = new InputDevices();
-        /// <summary>
-        /// Gets the singleton instance of the class.
-        /// </summary>
-        public static InputDevices Instance => instance;
+    /// <summary>
+    ///     Gets the singleton instance of the class.
+    /// </summary>
+    public static InputDevices Instance { get; } = new();
 
-        private readonly List<IInputDevice> inputDevices = new List<IInputDevice>();
+    public void Add(IInputDevice inputDevice)
+    {
+        inputDevices.Add(inputDevice);
+        Controllers.Instance.Update(inputDevices);
+    }
 
-        protected InputDevices()
-        {
+    public IInputDevice GetDeviceByName(string deviceName)
+    {
+        return inputDevices.FirstOrDefault(device => device.DisplayName == deviceName);
+    }
+    
+    public IInputDevice GetDeviceByGuid(string guid)
+    {
+        return inputDevices.FirstOrDefault(device => device.UniqueId == guid);
+    }
 
-        }
-
-        public void Add(IInputDevice inputDevice)
-        {
-            inputDevices.Add(inputDevice);
-            Controllers.Instance.Update(inputDevices);
-        }
-
-        public void Remove(IInputDevice inputDevice)
-        {
-            inputDevices.Remove(inputDevice);
-            Controllers.Instance.Update(inputDevices);
-        }
-
-        public IEnumerable<IInputDevice> GetDevices()
-        {
-            return inputDevices.ToArray();
-        }
+    public IEnumerable<IInputDevice> GetDevices()
+    {
+        return inputDevices.ToArray();
     }
 }
